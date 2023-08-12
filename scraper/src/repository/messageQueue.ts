@@ -7,9 +7,15 @@ export type ConsumerHandler = (
   channel: amqp.Channel,
 ) => void;
 
+export type PublishMessage = (
+  exchangeName: string,
+  message: string,
+) => Promise<boolean>;
+
 type MessageQueueConnection = Promise<
   [
-    (queue: string, consumerHandler: ConsumerHandler) => void,
+    (queueName: string, consumerHandler: ConsumerHandler) => void,
+    PublishMessage,
     () => Promise<void>,
   ]
 >;
@@ -19,14 +25,7 @@ export const connectMessageQueue: () => MessageQueueConnection = async () => {
 
   const channel = await connection.createChannel();
 
-  await channel.assertExchange(env.RABBITMQ_DLX, 'direct', {
-    durable: false,
-  });
-
   await channel.assertQueue(env.RABBITMQ_DLQ, { durable: false });
-
-  await channel.bindQueue(env.RABBITMQ_DLQ, env.RABBITMQ_DLX, '');
-
   await channel.assertQueue(env.RABBITMQ_QUEUE, {
     durable: false,
     arguments: {
@@ -34,9 +33,20 @@ export const connectMessageQueue: () => MessageQueueConnection = async () => {
     },
   });
 
-  const startConsumer = (queue: string, consumerHandler: ConsumerHandler) => {
+  await channel.assertExchange(env.RABBITMQ_DLX, 'direct', { durable: false });
+  await channel.assertExchange(env.RABBITMQ_EXCHANGE, 'direct', {
+    durable: true,
+  });
+
+  await channel.bindQueue(env.RABBITMQ_DLQ, env.RABBITMQ_DLX, '');
+  await channel.bindQueue(env.RABBITMQ_QUEUE, env.RABBITMQ_EXCHANGE, '');
+
+  const startConsumer = (
+    queueName: string,
+    consumerHandler: ConsumerHandler,
+  ) => {
     // eslint-disable-next-line
-    channel.consume(queue, (msg: amqp.ConsumeMessage | null) => {
+    channel.consume(queueName, (msg: amqp.ConsumeMessage | null) => {
       if (msg !== null) {
         consumerHandler(msg, channel);
       }
@@ -45,10 +55,15 @@ export const connectMessageQueue: () => MessageQueueConnection = async () => {
     console.log(`[messageQueue]: Consumer connected to ${env.RABBITMQ_QUEUE}`);
   };
 
+  const publishMessage: PublishMessage = async (exchangeName, message) =>
+    channel.publish(exchangeName, '', Buffer.from(message), {
+      persistent: true,
+    });
+
   const disconnect = async () => {
     await channel.close();
     await connection.close();
   };
 
-  return [startConsumer, disconnect];
+  return [startConsumer, publishMessage, disconnect];
 };
