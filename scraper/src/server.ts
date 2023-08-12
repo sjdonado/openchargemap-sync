@@ -65,6 +65,6 @@ export const start = async (port = env.PORT) => {
 };
 
 start().catch((err) => {
-  console.error(err);
+  console.error(err.message);
   process.exit(1);
 });

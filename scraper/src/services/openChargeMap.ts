@@ -11,7 +11,7 @@ export type Country = {
 
 type AddressInfo = {
   ID: number;
-  description: string;
+  Description: string;
   AddressLine1: string;
   AddressLine2?: string;
   Town: string;

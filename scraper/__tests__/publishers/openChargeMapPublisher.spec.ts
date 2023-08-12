@@ -1,6 +1,5 @@
-import { v4 as uuidv4 } from 'uuid';
-
 import { faker } from '@faker-js/faker';
+import { v4 as uuidv4 } from 'uuid';
 
 import { type Country } from '../../src/services/openChargeMap';
 
@@ -41,9 +40,7 @@ describe('openChargeMapPublisher', () => {
 
     await openChargeMapPublisher(countries, mockRepository);
 
-    expect(mockRepository.publishMessage).toHaveBeenCalledTimes(
-      countries.length,
-    );
+    expect(mockRepository.publishMessage).toHaveBeenCalledTimes(countries.length);
 
     countries.forEach((country: Country) => {
       const expectedMessage: ScraperMessage = {
@@ -60,7 +57,7 @@ describe('openChargeMapPublisher', () => {
   });
 
   it('should throw an error if publish fails', async () => {
-    const error = new Error();
+    const error = new Error('Mocked error');
 
     (uuidv4 as jest.Mock).mockReturnValue(mockedUUID);
     mockRepository.publishMessage.mockRejectedValue(error);
@@ -69,8 +66,6 @@ describe('openChargeMapPublisher', () => {
 
     await expect(promise).rejects.toThrow(error);
 
-    expect(mockRepository.publishMessage).toHaveBeenCalledTimes(
-      countries.length,
-    );
+    expect(mockRepository.publishMessage).toHaveBeenCalledTimes(countries.length);
   });
 });

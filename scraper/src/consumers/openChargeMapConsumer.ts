@@ -1,5 +1,3 @@
-import env from '../config/env';
-
 import { type Consumer } from '../repository/messageQueue';
 
 import { fetchPOIList, type POI } from '../services/openChargeMap';
@@ -12,11 +10,7 @@ export type PoiListSnapshot = {
   isCompleted: boolean;
 };
 
-export const openChargeMapConsumer: Consumer = async (
-  msg,
-  channel,
-  repository,
-) => {
+export const openChargeMapConsumer: Consumer = async (msg, channel, repository) => {
   const { id, country, countriesCount } = JSON.parse(
     msg.content.toString(),
   ) as ScraperMessage;
@@ -46,13 +40,11 @@ export const openChargeMapConsumer: Consumer = async (
       upsert: true,
     });
 
-    console.log(
-      `[openChargeMapConsumer]: ${poiList.length} POIs stored in database`,
-    );
+    console.log(`[openChargeMapConsumer]: ${poiList.length} POIs stored in database`);
 
     channel.ack(msg);
   } catch (err) {
-    console.error(`[openChargeMapConsumer]: ${err}`);
+    console.error(`[openChargeMapConsumer]: ${err.message}`);
 
     channel.nack(msg);
   }
