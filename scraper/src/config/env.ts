@@ -9,6 +9,9 @@ type Config = {
   RABBITMQ_EXCHANGE: string;
   RABBITMQ_DLX: string;
   RABBITMQ_DLQ: string;
+  OPENCHARGEMAP_BASE_URL: string;
+  OPENCHARGEMAP_API_KEY: string;
+  OPENCHARGEMAP_ALLOWED_COUNTRIES: string;
 };
 
 const config: Config = {
@@ -20,6 +23,9 @@ const config: Config = {
   RABBITMQ_EXCHANGE: process.env.RABBITMQ_EXCHANGE!,
   RABBITMQ_DLX: process.env.RABBITMQ_DLX!,
   RABBITMQ_DLQ: process.env.RABBITMQ_DLQ!,
+  OPENCHARGEMAP_BASE_URL: process.env.OPENCHARGEMAP_BASE_URL!,
+  OPENCHARGEMAP_API_KEY: process.env.OPENCHARGEMAP_API_KEY!,
+  OPENCHARGEMAP_ALLOWED_COUNTRIES: process.env.OPENCHARGEMAP_ALLOWED_COUNTRIES!,
 };
 
 export default config;

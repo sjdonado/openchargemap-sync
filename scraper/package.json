@@ -16,14 +16,17 @@
     "@types/amqplib": "^0.10.1",
     "amqplib": "^0.10.3",
     "dotenv": "^16.3.1",
-    "mongodb": "^5.7.0"
+    "mongodb": "^5.7.0",
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "@types/jest": "^29.5.3",
     "@types/node": "^20.4.9",
     "@types/sinon": "^10.0.16",
+    "@types/uuid": "^9.0.2",
     "@typescript-eslint/eslint-plugin": ">=6.0.0",
     "@typescript-eslint/parser": ">=6.0.0",
+    "axios": "^1.4.0",
     "eslint": ">=8.0.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-config-xo": "^0.43.1",

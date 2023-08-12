@@ -8,18 +8,29 @@ import { connectDatabase } from './repository/database';
 import { connectMessageQueue } from './repository/messageQueue';
 
 import { healthController } from './controllers/health';
+import { runController } from './controllers/run';
+
 import { openChargeMapConsumer } from './consumers/openChargeMapConsumer';
 
 const router: Router = {
   [Routes.HEALTH]: healthController,
+  [Routes.RUN]: runController,
 };
 
 async function main() {
   const [collections, disconnectDatabase] = await connectDatabase();
-  const [startConsumer, publishMessage, disconnectChannel] =
-    await connectMessageQueue();
+  const [
+    startConsumer,
+    publishMessage,
+    getQueueMessageCount,
+    disconnectChannel,
+  ] = await connectMessageQueue();
 
-  startConsumer(env.RABBITMQ_QUEUE, openChargeMapConsumer);
+  const repository = { collections, publishMessage, getQueueMessageCount };
+
+  startConsumer(env.RABBITMQ_QUEUE, async (msg, channel) =>
+    openChargeMapConsumer(msg, channel, repository),
+  );
 
   const server = http.createServer(async (req, res) => {
     if (!(`${req.url}` in router)) {
@@ -31,7 +42,7 @@ async function main() {
 
     const endpoint = req.url as Routes;
 
-    await router[endpoint](req, res, { collections, publishMessage });
+    await router[endpoint](req, res, repository);
   });
 
   server.on('close', async () => {

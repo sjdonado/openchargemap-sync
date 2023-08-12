@@ -2,10 +2,13 @@ import amqp from 'amqplib';
 
 import env from '../config/env';
 
-export type ConsumerHandler = (
+import { type Repository } from '../router';
+
+export type Consumer = (
   msg: amqp.ConsumeMessage,
   channel: amqp.Channel,
-) => void;
+  repository?: Repository,
+) => Promise<void>;
 
 export type PublishMessage = (
   exchangeName: string,
@@ -14,8 +17,9 @@ export type PublishMessage = (
 
 type MessageQueueConnection = Promise<
   [
-    (queueName: string, consumerHandler: ConsumerHandler) => void,
+    (queueName: string, consumerHandler: Consumer) => void,
     PublishMessage,
+    () => number,
     () => Promise<void>,
   ]
 >;
@@ -26,7 +30,7 @@ export const connectMessageQueue: () => MessageQueueConnection = async () => {
   const channel = await connection.createChannel();
 
   await channel.assertQueue(env.RABBITMQ_DLQ, { durable: false });
-  await channel.assertQueue(env.RABBITMQ_QUEUE, {
+  const queue = await channel.assertQueue(env.RABBITMQ_QUEUE, {
     durable: true,
     arguments: {
       'x-dead-letter-exchange': env.RABBITMQ_DLX,
@@ -41,13 +45,11 @@ export const connectMessageQueue: () => MessageQueueConnection = async () => {
   await channel.bindQueue(env.RABBITMQ_DLQ, env.RABBITMQ_DLX, '');
   await channel.bindQueue(env.RABBITMQ_QUEUE, env.RABBITMQ_EXCHANGE, '');
 
-  const startConsumer = (
-    queueName: string,
-    consumerHandler: ConsumerHandler,
-  ) => {
+  const startConsumer = (queueName: string, consumerHandler: Consumer) => {
     // eslint-disable-next-line
     channel.consume(queueName, (msg: amqp.ConsumeMessage | null) => {
       if (msg !== null) {
+        // eslint-disable-next-line
         consumerHandler(msg, channel);
       }
     });
@@ -60,10 +62,12 @@ export const connectMessageQueue: () => MessageQueueConnection = async () => {
       persistent: true,
     });
 
+  const getQueueMessageCount = () => queue.messageCount;
+
   const disconnect = async () => {
     await channel.close();
     await connection.close();
   };
 
-  return [startConsumer, publishMessage, disconnect];
+  return [startConsumer, publishMessage, getQueueMessageCount, disconnect];
 };
