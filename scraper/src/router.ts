@@ -7,7 +7,6 @@ import { type PublishMessage } from './repository/messageQueue';
 export type Repository = {
   collections: DatabaseCollections;
   publishMessage: PublishMessage;
-  getQueueMessageCount: () => number;
 };
 
 export type Controller = (

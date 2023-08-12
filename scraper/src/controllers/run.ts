@@ -1,4 +1,4 @@
-import { fetchReferenceData } from '../logic/openChargeMap';
+import { fetchReferenceData } from '../services/openChargeMap';
 
 import { type Controller } from '../router';
 import { openChargeMapPublisher } from '../publishers/openChargeMapPublisher';

@@ -2,7 +2,7 @@ import 'dotenv/config';
 
 type Config = {
   NODE_ENV: string;
-  PORT: string;
+  PORT: number;
   MONGO_URI: string;
   RABBITMQ_URI: string;
   RABBITMQ_QUEUE: string;
@@ -16,7 +16,7 @@ type Config = {
 
 const config: Config = {
   NODE_ENV: process.env.NODE_ENV ?? 'development',
-  PORT: process.env.PORT ?? '3000',
+  PORT: Number(process.env.PORT ?? '3000'),
   MONGO_URI: process.env.MONGO_URI!,
   RABBITMQ_URI: process.env.RABBITMQ_URI!,
   RABBITMQ_QUEUE: process.env.RABBITMQ_QUEUE!,

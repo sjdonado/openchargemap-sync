@@ -19,7 +19,6 @@ type MessageQueueConnection = Promise<
   [
     (queueName: string, consumerHandler: Consumer) => void,
     PublishMessage,
-    () => number,
     () => Promise<void>,
   ]
 >;
@@ -30,7 +29,7 @@ export const connectMessageQueue: () => MessageQueueConnection = async () => {
   const channel = await connection.createChannel();
 
   await channel.assertQueue(env.RABBITMQ_DLQ, { durable: false });
-  const queue = await channel.assertQueue(env.RABBITMQ_QUEUE, {
+  await channel.assertQueue(env.RABBITMQ_QUEUE, {
     durable: true,
     arguments: {
       'x-dead-letter-exchange': env.RABBITMQ_DLX,
@@ -62,12 +61,10 @@ export const connectMessageQueue: () => MessageQueueConnection = async () => {
       persistent: true,
     });
 
-  const getQueueMessageCount = () => queue.messageCount;
-
   const disconnect = async () => {
     await channel.close();
     await connection.close();
   };
 
-  return [startConsumer, publishMessage, getQueueMessageCount, disconnect];
+  return [startConsumer, publishMessage, disconnect];
 };

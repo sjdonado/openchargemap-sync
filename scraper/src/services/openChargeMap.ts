@@ -110,8 +110,12 @@ export const fetchReferenceData = async () => {
 };
 
 export const fetchPOIList = async (countryId: number) => {
-  const endpoint = `${env.OPENCHARGEMAP_BASE_URL}/poi?countryId=${countryId}`;
+  const endpoint = `${env.OPENCHARGEMAP_BASE_URL}/poi`;
   const response = await axios(endpoint, {
+    params: {
+      countryId,
+      maxResults: 10e8,
+    },
     headers: {
       'X-API-Key': env.OPENCHARGEMAP_API_KEY,
     },

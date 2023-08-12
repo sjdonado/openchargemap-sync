@@ -2,13 +2,14 @@ import env from '../config/env';
 
 import { type Consumer } from '../repository/messageQueue';
 
-import { fetchPOIList, type POI } from '../logic/openChargeMap';
+import { fetchPOIList, type POI } from '../services/openChargeMap';
 import { type ScraperMessage } from '../publishers/openChargeMapPublisher';
 
 export type PoiListSnapshot = {
   id: string;
   poiList: POI[];
-  completed: boolean;
+  countriesProcessed: number;
+  isCompleted: boolean;
 };
 
 export const openChargeMapConsumer: Consumer = async (
@@ -16,18 +17,28 @@ export const openChargeMapConsumer: Consumer = async (
   channel,
   repository,
 ) => {
-  const { id, country } = JSON.parse(msg.content.toString()) as ScraperMessage;
+  const { id, country, countriesCount } = JSON.parse(
+    msg.content.toString(),
+  ) as ScraperMessage;
 
   try {
-    const poiList = await fetchPOIList(country.ID);
-    const queueMessageCount = repository?.getQueueMessageCount();
-
     const filter = { id };
+
+    const poiList = await fetchPOIList(country.ID);
+
+    const oldSnapshot = (await repository?.collections.poiListSnapshots.findOne(
+      filter,
+    )) as PoiListSnapshot | undefined;
+
+    const countriesProcessed = (oldSnapshot?.countriesProcessed ?? 0) + 1;
+
     const update = {
       $set: {
         id,
-        poiList,
-        completed: queueMessageCount === 1,
+        poiList: [...(oldSnapshot?.poiList ?? []), ...poiList],
+        countriesProcessed,
+        isCompleted: countriesProcessed === countriesCount,
+        _id: undefined,
       },
     };
 

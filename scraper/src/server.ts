@@ -2,7 +2,7 @@ import * as http from 'http';
 
 import env from './config/env';
 
-import { Routes, type Router } from './router';
+import { Routes, type Router, type Repository } from './router';
 
 import { connectDatabase } from './repository/database';
 import { connectMessageQueue } from './repository/messageQueue';
@@ -17,16 +17,15 @@ const router: Router = {
   [Routes.RUN]: runController,
 };
 
-async function main() {
+export const start = async (port = env.PORT) => {
   const [collections, disconnectDatabase] = await connectDatabase();
   const [
-    startConsumer,
+    startConsumer, //
     publishMessage,
-    getQueueMessageCount,
     disconnectChannel,
   ] = await connectMessageQueue();
 
-  const repository = { collections, publishMessage, getQueueMessageCount };
+  const repository: Repository = { collections, publishMessage };
 
   startConsumer(env.RABBITMQ_QUEUE, async (msg, channel) =>
     openChargeMapConsumer(msg, channel, repository),
@@ -50,12 +49,22 @@ async function main() {
     await disconnectChannel();
   });
 
-  server.listen(env.PORT, () => {
-    console.log(`Server listening on PORT ${env.PORT}`);
-  });
-}
+  const disconnect = async () =>
+    new Promise<void>((resolve) => {
+      server.close(() => {
+        console.log('[server]: closed');
+        resolve();
+      });
+    });
 
-main().catch((err) => {
+  server.listen(port, () => {
+    console.log(`[server] listening on PORT ${env.PORT}`);
+  });
+
+  return [repository, disconnect] as [Repository, () => Promise<void>];
+};
+
+start().catch((err) => {
   console.error(err);
   process.exit(1);
 });
