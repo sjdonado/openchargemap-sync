@@ -6,9 +6,11 @@ export type DatabaseCollections = {
   poiListSnapshots: Collection;
 };
 
-export type DatabaseConnection = [DatabaseCollections, () => Promise<void>];
+export type DatabaseConnection = Promise<
+  [DatabaseCollections, () => Promise<void>]
+>;
 
-export async function connectDatabase(): Promise<DatabaseConnection> {
+export async function connectDatabase(): DatabaseConnection {
   const client = new MongoClient(env.MONGO_URI);
 
   await client.connect();
