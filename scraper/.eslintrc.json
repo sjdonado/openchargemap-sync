@@ -1,0 +1,36 @@
+{
+  "env": {
+    "es2021": true,
+    "node": true,
+    "jest": true
+  },
+  "extends": [
+    "xo"
+  ],
+  "parserOptions": {
+    "ecmaVersion": "es2021",
+    "sourceType": "module"
+  },
+  "overrides": [
+    {
+      "extends": [
+        "xo-typescript",
+        "prettier"
+      ],
+      "files": [
+        "*.ts"
+      ],
+      "rules": {
+        "@typescript-eslint/naming-convention": [
+          "error",
+          {
+            "selector": "property",
+            "format": null
+          }
+        ],
+        "@typescript-eslint/consistent-type-assertions": "off"
+      }
+    }
+  ],
+  "rules": {}
+}

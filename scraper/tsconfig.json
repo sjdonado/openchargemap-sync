@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "rootDirs": ["src"],
+    "outDir": "build",
+    "lib": ["es2021"],
+    "target": "es2021",
+    "module": "nodenext",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "strictNullChecks": true,
+    "sourceMap": true,
+    "types": ["node", "jest"]
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "src/**/*.spec.ts"]
+}
