@@ -4,15 +4,16 @@ services:
     image: mongo:latest
     ports:
       - 27017:27017
+    volumes:
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: not_secure
-
+      MONGO_INITDB_ROOT_USERNAME: root_user
+      MONGO_INITDB_ROOT_PASSWORD: root_pass
+      MONGO_INITDB_DATABASE: EVChargingData
   redis:
     image: redis:latest
     ports:
       - 6379:6379
-
   rabbitmq:
     image: rabbitmq:management
     ports:

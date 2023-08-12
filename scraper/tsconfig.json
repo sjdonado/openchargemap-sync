@@ -10,5 +10,7 @@
     "strictNullChecks": true,
     "sourceMap": true,
     "types": ["node", "jest"]
-  }
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "src/**/*.spec.ts"]
 }
