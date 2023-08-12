@@ -10,6 +10,8 @@ import { POIList } from '../fixtures/poiList';
 
 jest.mock('../../src/services/openChargeMap');
 
+const consoleErrorMock = jest.spyOn(console, 'error');
+
 const mockMsg = {
   content: {
     toString: jest.fn(),
@@ -29,8 +31,6 @@ describe('openChargeMapConsumer', () => {
     country: Country,
     countriesCount: 1,
   };
-
-  const consoleErrorMock = jest.spyOn(console, 'error');
 
   beforeEach(() => {
     jest.clearAllMocks();

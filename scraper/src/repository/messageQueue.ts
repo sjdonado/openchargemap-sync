@@ -10,10 +10,7 @@ export type Consumer = (
   repository?: Repository,
 ) => Promise<void>;
 
-export type PublishMessage = (
-  exchangeName: string,
-  message: string,
-) => Promise<boolean>;
+export type PublishMessage = (exchangeName: string, message: string) => Promise<boolean>;
 
 type MessageQueueConnection = Promise<
   [

@@ -25,10 +25,7 @@ export const openChargeMapPublisher = async (
         countriesCount: countries.length,
       };
 
-      await repository.publishMessage(
-        env.RABBITMQ_EXCHANGE,
-        JSON.stringify(message),
-      );
+      await repository.publishMessage(env.RABBITMQ_EXCHANGE, JSON.stringify(message));
     }),
   );
 };

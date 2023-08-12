@@ -99,12 +99,8 @@ export const fetchReferenceData = async () => {
 
   const data = response.data as CoreReferenceData;
 
-  const allowedCountriesSet = new Set(
-    env.OPENCHARGEMAP_ALLOWED_COUNTRIES.split(','),
-  );
-  const countries = data.Countries.filter((c) =>
-    allowedCountriesSet.has(c.ISOCode),
-  );
+  const allowedCountriesSet = new Set(env.OPENCHARGEMAP_ALLOWED_COUNTRIES.split(','));
+  const countries = data.Countries.filter((c) => allowedCountriesSet.has(c.ISOCode));
 
   return { countries };
 };

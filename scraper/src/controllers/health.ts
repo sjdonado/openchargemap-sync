@@ -1,8 +1,7 @@
 import { type Controller } from '../router';
 
 export const healthController: Controller = async (req, res, repository) => {
-  const snapshotsCount =
-    await repository.collections.poiListSnapshots.countDocuments();
+  const snapshotsCount = await repository.collections.poiListSnapshots.countDocuments();
 
   const response = {
     status: 'ok',
