@@ -1,6 +1,6 @@
 import { healthController } from '../../src/controllers/health';
 
-import { req, res } from '../mocks/http';
+import { mockReq, mockRes } from '../mocks/http';
 import { mockRepository } from '../mocks/repository';
 
 describe('healthController', () => {
@@ -16,12 +16,12 @@ describe('healthController', () => {
       mockRepository.collections.poiListSnapshots.countDocuments as jest.Mock
     ).mockResolvedValue(snapshotsCount);
 
-    await healthController(req, res, mockRepository);
+    await healthController(mockReq, mockRes, mockRepository);
 
-    expect(res.writeHead).toBeCalledWith(200, {
+    expect(mockRes.writeHead).toBeCalledWith(200, {
       'Content-Type': 'application/json',
     });
 
-    expect(res.end).toBeCalledWith(JSON.stringify(expectedResponse));
+    expect(mockRes.end).toBeCalledWith(JSON.stringify(expectedResponse));
   });
 });
