@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "description": "Pull data from openchargemap.org",
   "scripts": {
+    "build": "tsc",
+    "start": "node ./build/server.js",
     "dev": "tsc-watch --onSuccess \"node ./build/server.js\"",
     "test": "jest"
   },

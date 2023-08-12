@@ -27,7 +27,7 @@ export const connectMessageQueue: () => MessageQueueConnection = async () => {
 
   await channel.assertQueue(env.RABBITMQ_DLQ, { durable: false });
   await channel.assertQueue(env.RABBITMQ_QUEUE, {
-    durable: false,
+    durable: true,
     arguments: {
       'x-dead-letter-exchange': env.RABBITMQ_DLX,
     },

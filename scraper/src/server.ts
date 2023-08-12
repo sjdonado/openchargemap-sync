@@ -19,6 +19,8 @@ async function main() {
   const [startConsumer, publishMessage, disconnectChannel] =
     await connectMessageQueue();
 
+  startConsumer(env.RABBITMQ_QUEUE, openChargeMapConsumer);
+
   const server = http.createServer(async (req, res) => {
     if (!(`${req.url}` in router)) {
       res.writeHead(404, { 'Content-Type': 'application/json' });
