@@ -28,8 +28,7 @@ export const openChargeMapPublisher = async (
       await repository.publishMessage(env.RABBITMQ_EXCHANGE, JSON.stringify(message));
 
       console.log(
-        `[openChargeMapPublisher]: ${id.toString('D')} ${country.ISOCode} - ${
-          countries.length
+        `[openChargeMapPublisher]: ${id.toString('D')} ${country.ISOCode} - ${countries.length
         }`,
       );
     }),

@@ -110,7 +110,7 @@ export const fetchPOIList = async (countryId: number) => {
   const response = await axios(endpoint, {
     params: {
       countryid: countryId,
-      maxresults: 10e2,
+      maxresults: 10e4,
     },
     headers: {
       'X-API-Key': env.OPENCHARGEMAP_API_KEY,

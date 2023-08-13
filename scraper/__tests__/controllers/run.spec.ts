@@ -5,12 +5,13 @@ import { runController } from '../../src/controllers/run';
 import { mockReq, mockRes } from '../mocks/http';
 import { mockRepository } from '../mocks/repository';
 
-import { POIList } from '../fixtures/poiList';
+import { generatePOIList } from '../fixtures/poiList';
 
 jest.mock('../../src/services/openChargeMap');
 jest.mock('../../src/publishers/openChargeMapPublisher');
 
 describe('runController', () => {
+  const POIList = generatePOIList();
   const countries = [POIList[0].AddressInfo.Country];
 
   it('should fetch reference data and publish messages', async () => {

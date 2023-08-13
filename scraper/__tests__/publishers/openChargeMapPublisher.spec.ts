@@ -9,11 +9,19 @@ import {
 } from '../../src/publishers/openChargeMapPublisher';
 
 import { mockRepository } from '../mocks/repository';
+import { mockMUUID } from '../mocks/muuid';
 
-jest.mock('uuid-mongodb', () => ({ v4: jest.fn() }));
+jest.mock('uuid-mongodb', () => {
+  const actual: jest.Mocked<typeof MUUID> = jest.requireActual('uuid-mongodb');
+
+  return {
+    ...actual,
+    v4: jest.fn(),
+  };
+});
 
 describe('openChargeMapPublisher', () => {
-  const mockedUUID = MUUID.v4();
+  const mockedUUID = MUUID.from(faker.string.uuid());
 
   const countries: Country[] = [
     {
