@@ -58,13 +58,8 @@ export const start = async (port = env.PORT) => {
     });
 
   server.listen(port, () => {
-    console.log(`[server] listening on PORT ${env.PORT}`);
+    console.log(`[server] listening on PORT ${port}`);
   });
 
   return [repository, disconnect] as [Repository, () => Promise<void>];
 };
-
-start().catch((err) => {
-  console.error(err.message);
-  process.exit(1);
-});

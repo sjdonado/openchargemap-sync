@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from 'uuid';
+import * as MUUID from 'uuid-mongodb';
 
 import env from '../config/env';
 
@@ -6,7 +6,7 @@ import { type Repository } from '../router';
 import { type Country } from '../services/openChargeMap';
 
 export type ScraperMessage = {
-  id: string;
+  id: MUUID.MUUID;
   country: Country;
   countriesCount: number;
 };
@@ -15,7 +15,7 @@ export const openChargeMapPublisher = async (
   countries: Country[],
   repository: Repository,
 ) => {
-  const id = uuidv4();
+  const id = MUUID.v4();
 
   await Promise.all(
     countries.map(async (country) => {
@@ -26,6 +26,12 @@ export const openChargeMapPublisher = async (
       };
 
       await repository.publishMessage(env.RABBITMQ_EXCHANGE, JSON.stringify(message));
+
+      console.log(
+        `[openChargeMapPublisher]: ${id.toString('D')} ${country.ISOCode} - ${
+          countries.length
+        }`,
+      );
     }),
   );
 };

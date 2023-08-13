@@ -14,9 +14,8 @@ export const openChargeMapConsumer: Consumer = async (msg, channel, repository) 
   const { id, country, countriesCount } = JSON.parse(
     msg.content.toString(),
   ) as ScraperMessage;
-
   try {
-    const filter = { id };
+    const filter = { _id: id };
 
     const poiList = await fetchPOIList(country.ID);
 
@@ -28,11 +27,10 @@ export const openChargeMapConsumer: Consumer = async (msg, channel, repository) 
 
     const update = {
       $set: {
-        id,
+        _id: id,
         poiList: [...(oldSnapshot?.poiList ?? []), ...poiList],
         countriesProcessed,
         isCompleted: countriesProcessed === countriesCount,
-        _id: undefined,
       },
     };
 
@@ -45,7 +43,5 @@ export const openChargeMapConsumer: Consumer = async (msg, channel, repository) 
     channel.ack(msg);
   } catch (err) {
     console.error(`[openChargeMapConsumer]: ${err.message}`);
-
-    channel.nack(msg);
   }
 };

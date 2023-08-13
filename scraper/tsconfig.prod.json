@@ -1,16 +1,15 @@
 {
   "compilerOptions": {
-    "rootDirs": ["src"],
-    "outDir": "build",
+    "rootDir": "src",
+    "outDir": "dist",
     "lib": ["es2022"],
-    "target": "es2021",
+    "target": "es2022",
     "module": "nodenext",
     "moduleResolution": "node",
     "esModuleInterop": true,
     "strictNullChecks": true,
     "sourceMap": true,
-    "types": ["node", "jest"]
+    "types": ["node"]
   },
-  "include": ["src/**/*.ts", "__tests__/**/*.ts"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "__tests__"]
 }

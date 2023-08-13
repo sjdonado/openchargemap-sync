@@ -1,4 +1,4 @@
-import { faker } from '@faker-js/faker';
+import * as MUUID from 'uuid-mongodb';
 import type amqp from 'amqplib';
 
 import { openChargeMapConsumer } from '../../src/consumers/openChargeMapConsumer';
@@ -27,7 +27,7 @@ describe('openChargeMapConsumer', () => {
   const { Country } = POIList[0].AddressInfo;
 
   const message: ScraperMessage = {
-    id: faker.string.uuid(),
+    id: MUUID.from('5bd0e26c-6567-4ccc-b896-e0d451c384db'),
     country: Country,
     countriesCount: 1,
   };
@@ -41,25 +41,25 @@ describe('openChargeMapConsumer', () => {
 
     (fetchPOIList as jest.Mock).mockResolvedValue(POIList);
 
-    (mockRepository.collections.poiListSnapshots.findOne as jest.Mock).mockResolvedValue(
-      undefined,
-    );
+    (
+      mockRepository.collections.poiListSnapshots.findOne as jest.Mock
+    ).mockImplementation();
 
     (
       mockRepository.collections.poiListSnapshots.updateOne as jest.Mock
-    ).mockResolvedValue(undefined);
+    ).mockImplementation();
 
     await openChargeMapConsumer(mockMsg, mockChannel, mockRepository);
 
     expect(fetchPOIList).toHaveBeenCalledWith(Country.ID);
 
     expect(mockRepository.collections.poiListSnapshots.findOne).toHaveBeenCalledWith({
-      id: message.id,
+      _id: 'W9DibGVnTMy4luDUUcOE2w==',
     });
 
     expect(mockRepository.collections.poiListSnapshots.updateOne).toHaveBeenCalledWith(
       {
-        id: message.id,
+        _id: 'W9DibGVnTMy4luDUUcOE2w==',
       },
       expect.any(Object),
       {

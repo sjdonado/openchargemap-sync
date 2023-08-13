@@ -1,5 +1,5 @@
+import * as MUUID from 'uuid-mongodb';
 import { faker } from '@faker-js/faker';
-import { v4 as uuidv4 } from 'uuid';
 
 import { type Country } from '../../src/services/openChargeMap';
 
@@ -10,10 +10,10 @@ import {
 
 import { mockRepository } from '../mocks/repository';
 
-jest.mock('uuid', () => ({ v4: jest.fn() }));
+jest.mock('uuid-mongodb', () => ({ v4: jest.fn() }));
 
 describe('openChargeMapPublisher', () => {
-  const mockedUUID = faker.string.uuid();
+  const mockedUUID = MUUID.v4();
 
   const countries: Country[] = [
     {
@@ -35,7 +35,7 @@ describe('openChargeMapPublisher', () => {
   });
 
   it('should publish messages for each country', async () => {
-    (uuidv4 as jest.Mock).mockReturnValue(mockedUUID);
+    (MUUID.v4 as jest.Mock).mockReturnValue(mockedUUID);
     mockRepository.publishMessage.mockResolvedValue(true);
 
     await openChargeMapPublisher(countries, mockRepository);
@@ -59,7 +59,7 @@ describe('openChargeMapPublisher', () => {
   it('should throw an error if publish fails', async () => {
     const error = new Error('Mocked error');
 
-    (uuidv4 as jest.Mock).mockReturnValue(mockedUUID);
+    (MUUID.v4 as jest.Mock).mockReturnValue(mockedUUID);
     mockRepository.publishMessage.mockRejectedValue(error);
 
     const promise = openChargeMapPublisher(countries, mockRepository);
