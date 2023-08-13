@@ -20,7 +20,7 @@ jest.mock('uuid-mongodb', () => {
 });
 
 describe('openChargeMapPublisher', () => {
-  const mockedUUID = MUUID.from(faker.string.uuid());
+  const mockedUUID = faker.string.uuid();
 
   const countries: Country[] = [
     {

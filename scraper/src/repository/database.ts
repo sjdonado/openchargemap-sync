@@ -4,6 +4,7 @@ import env from '../config/env';
 
 export type DatabaseCollections = {
   poiListSnapshots: Collection;
+  pois: Collection;
 };
 
 export type DatabaseConnection = Promise<
@@ -21,6 +22,7 @@ export async function connectDatabase(): DatabaseConnection {
 
   const collections = {
     poiListSnapshots: client.db().collection('poiListSnapshots'),
+    pois: client.db().collection('pois'),
   };
 
   console.log(`[database]: Connected to ${env.MONGO_URI}`);

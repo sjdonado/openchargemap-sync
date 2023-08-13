@@ -1,14 +1,20 @@
-import type * as MUUID from 'uuid-mongodb';
+import * as _ from 'lodash';
+import * as MUUID from 'uuid-mongodb';
 import { type Consumer } from '../repository/messageQueue';
 
+import { POI_LIST_CHUNK_SIZE } from '../config/constant';
 import { fetchPOIList, type POI } from '../services/openChargeMap';
 import { type ScraperMessage } from '../publishers/openChargeMapPublisher';
 
 export type POIListSnapshot = {
   _id: MUUID.MUUID;
-  poiList: POI[];
+  poiListIds: MUUID.MUUID[];
   countriesProcessed: number;
   isCompleted: boolean;
+};
+
+export type POIDocument = POI & {
+  _id: MUUID.MUUID;
 };
 
 export const openChargeMapConsumer: Consumer = async (msg, channel, repository) => {
@@ -19,11 +25,37 @@ export const openChargeMapConsumer: Consumer = async (msg, channel, repository) 
   const session = await repository.startDBSession();
 
   try {
-    const filter = { _id: id };
+    const filter = { _id: MUUID.from(id) };
 
     const poiList = await fetchPOIList(country.ID);
 
+    const chunkedPOIList: POI[][] =
+      poiList.length > POI_LIST_CHUNK_SIZE
+        ? _.chunk(poiList, POI_LIST_CHUNK_SIZE)
+        : [poiList];
+
     await session.withTransaction(async () => {
+      const chunckedPoiListInsertedIds = await Promise.all(
+        chunkedPOIList.map(async (poiListChunk) => {
+          const poiListChunkWithIds: POIDocument[] = poiListChunk.map((poi) => ({
+            _id: MUUID.v4(),
+            ...poi,
+          }));
+
+          const { insertedIds } = await repository.collections.pois.insertMany(
+            // @ts-expect-error _id is a valid field
+            poiListChunkWithIds,
+            {
+              session,
+            },
+          );
+
+          return _.values(insertedIds);
+        }),
+      );
+
+      const poiListChunkIds = _.flatten(chunckedPoiListInsertedIds);
+
       const currentSnapshot =
         await repository.collections.poiListSnapshots.findOne<POIListSnapshot>(filter, {
           session,
@@ -33,8 +65,8 @@ export const openChargeMapConsumer: Consumer = async (msg, channel, repository) 
 
       const update = {
         $set: {
-          _id: id,
-          poiList: [...(currentSnapshot?.poiList ?? []), ...poiList],
+          _id: filter._id,
+          poiListIds: [...(currentSnapshot?.poiListIds ?? []), ...poiListChunkIds],
           isCompleted: countriesCount === countriesProcessed,
         },
         $inc: {
@@ -47,12 +79,14 @@ export const openChargeMapConsumer: Consumer = async (msg, channel, repository) 
         session,
       });
 
-      console.log(`[openChargeMapConsumer]: ${poiList.length} POIs stored in database`);
+      console.log(
+        `[openChargeMapConsumer]: ${poiListChunkIds.length} POIs stored in database`,
+      );
     });
 
     channel.ack(msg);
   } catch (err) {
-    console.error(`[openChargeMapConsumer]: ${err.message}`);
+    console.error('[openChargeMapConsumer]', err);
   } finally {
     await session.endSession();
   }

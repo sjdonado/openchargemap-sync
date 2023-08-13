@@ -1,5 +1,8 @@
+import { type ClientSession } from 'mongodb';
 import * as MUUID from 'uuid-mongodb';
 import type amqp from 'amqplib';
+
+import { faker } from '@faker-js/faker';
 
 import {
   type POIListSnapshot,
@@ -12,7 +15,6 @@ import { type ScraperMessage } from '../../src/publishers/openChargeMapPublisher
 import { mockRepository } from '../mocks/repository';
 import { generatePOIList } from '../fixtures/poiList';
 import { referenceData } from '../fixtures/referenceData';
-import { ClientSession } from 'mongodb';
 
 jest.mock('../../src/services/openChargeMap');
 
@@ -32,22 +34,23 @@ const mockChannel = {
 describe('openChargeMapConsumer', () => {
   const POIList = generatePOIList(1);
 
-  const snapshotId = '5bd0e26c-6567-4ccc-b896-e0d451c384db';
-  const snapshotIdBase64 = 'W9DibGVnTMy4luDUUcOE2w==';
+  const snapshotId = faker.string.uuid();
   const countriesCount = 2;
 
   const messages: ScraperMessage[] = [
     {
-      id: MUUID.from(snapshotId),
+      id: snapshotId,
       country: referenceData.Countries[1],
       countriesCount,
     },
     {
-      id: MUUID.from(snapshotId),
+      id: snapshotId,
       country: referenceData.Countries[2],
       countriesCount,
     },
   ];
+
+  const insertedIds = [MUUID.v4(), MUUID.v4(), MUUID.v4()];
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -59,6 +62,10 @@ describe('openChargeMapConsumer', () => {
     (mockMsg.content.toString as jest.Mock).mockReturnValue(JSON.stringify(message));
 
     (fetchPOIList as jest.Mock).mockResolvedValue(POIList);
+
+    (
+      mockRepository.collections.poiListSnapshots.insertMany as jest.Mock
+    ).mockResolvedValue({ insertedIds });
 
     (
       mockRepository.collections.poiListSnapshots.findOne as jest.Mock
@@ -74,7 +81,7 @@ describe('openChargeMapConsumer', () => {
 
     expect(mockRepository.collections.poiListSnapshots.findOne).toHaveBeenCalledWith(
       {
-        _id: snapshotIdBase64,
+        _id: expect.anything() as jest.Mocked<MUUID.MUUID>,
       },
       {
         session: expect.any(Object) as jest.Mocked<ClientSession>,
@@ -83,23 +90,36 @@ describe('openChargeMapConsumer', () => {
 
     expect(mockRepository.collections.poiListSnapshots.updateOne).toHaveBeenCalledWith(
       {
-        _id: snapshotIdBase64,
+        _id: expect.anything() as jest.Mocked<MUUID.MUUID>,
       },
-      {
+      expect.objectContaining({
         $set: {
-          _id: snapshotIdBase64,
-          poiList: POIList,
+          _id: expect.anything() as jest.Mocked<MUUID.MUUID>,
+          poiListIds: insertedIds,
           isCompleted: false,
         },
         $inc: {
           countriesProcessed: 1,
         },
-      },
+      }),
       {
         upsert: true,
         session: expect.any(Object) as jest.Mocked<ClientSession>,
       },
     );
+
+    expect(mockRepository.collections.poiListSnapshots.insertMany).toHaveBeenCalledWith(
+      [
+        {
+          _id: expect.anything() as jest.Mocked<MUUID.MUUID>,
+          ...POIList[0],
+        },
+      ],
+      {
+        session: expect.any(Object) as jest.Mocked<ClientSession>,
+      },
+    );
+
     expect(mockChannel.ack).toHaveBeenCalledWith(mockMsg);
   });
 
@@ -108,7 +128,7 @@ describe('openChargeMapConsumer', () => {
 
     const currentSnapshot: POIListSnapshot = {
       _id: MUUID.from(snapshotId),
-      poiList: POIList,
+      poiListIds: [MUUID.v4(), MUUID.v4(), MUUID.v4()],
       countriesProcessed: 1,
       isCompleted: false,
     };
@@ -116,6 +136,10 @@ describe('openChargeMapConsumer', () => {
     (mockMsg.content.toString as jest.Mock).mockReturnValue(JSON.stringify(message));
 
     (fetchPOIList as jest.Mock).mockResolvedValue(POIList);
+
+    (
+      mockRepository.collections.poiListSnapshots.insertMany as jest.Mock
+    ).mockResolvedValue({ insertedIds });
 
     (mockRepository.collections.poiListSnapshots.findOne as jest.Mock).mockReturnValue(
       currentSnapshot,
@@ -131,7 +155,7 @@ describe('openChargeMapConsumer', () => {
 
     expect(mockRepository.collections.poiListSnapshots.findOne).toHaveBeenCalledWith(
       {
-        _id: snapshotIdBase64,
+        _id: expect.anything() as jest.Mocked<MUUID.MUUID>,
       },
       {
         session: expect.any(Object) as jest.Mocked<ClientSession>,
@@ -140,23 +164,36 @@ describe('openChargeMapConsumer', () => {
 
     expect(mockRepository.collections.poiListSnapshots.updateOne).toHaveBeenCalledWith(
       {
-        _id: snapshotIdBase64,
+        _id: expect.anything() as jest.Mocked<MUUID.MUUID>,
       },
-      {
+      expect.objectContaining({
         $set: {
-          _id: snapshotIdBase64,
-          poiList: [...currentSnapshot.poiList, ...POIList],
+          _id: expect.anything() as jest.Mocked<MUUID.MUUID>,
+          poiListIds: [...currentSnapshot.poiListIds, ...insertedIds],
           isCompleted: true,
         },
         $inc: {
           countriesProcessed: 1,
         },
-      },
+      }),
       {
         upsert: true,
         session: expect.any(Object) as jest.Mocked<ClientSession>,
       },
     );
+
+    expect(mockRepository.collections.poiListSnapshots.insertMany).toHaveBeenCalledWith(
+      [
+        {
+          _id: expect.anything() as jest.Mocked<MUUID.MUUID>,
+          ...POIList[0],
+        },
+      ],
+      {
+        session: expect.any(Object) as jest.Mocked<ClientSession>,
+      },
+    );
+
     expect(mockChannel.ack).toHaveBeenCalledWith(mockMsg);
   });
 
@@ -175,8 +212,6 @@ describe('openChargeMapConsumer', () => {
     expect(mockRepository.collections.poiListSnapshots.findOne).not.toHaveBeenCalled();
     // TODO: configure retry/recovery logic
     // expect(mockChannel.nack).toHaveBeenCalledWith(mockMsg);
-    expect(consoleErrorMock).toHaveBeenCalledWith(
-      `[openChargeMapConsumer]: ${error.message}`,
-    );
+    expect(consoleErrorMock).toHaveBeenCalledWith('[openChargeMapConsumer]', error);
   });
 });
