@@ -23,32 +23,33 @@ export const openChargeMapConsumer: Consumer = async (msg, channel, repository) 
 
     const poiList = await fetchPOIList(country.ID);
 
-    session.startTransaction();
+    await session.withTransaction(async () => {
+      const currentSnapshot =
+        await repository.collections.poiListSnapshots.findOne<POIListSnapshot>(filter, {
+          session,
+        });
 
-    const currentSnapshot =
-      await repository.collections.poiListSnapshots.findOne<POIListSnapshot>(filter);
+      const countriesProcessed = (currentSnapshot?.countriesProcessed ?? 0) + 1;
 
-    const countriesProcessed = (currentSnapshot?.countriesProcessed ?? 0) + 1;
+      const update = {
+        $set: {
+          _id: id,
+          poiList: [...(currentSnapshot?.poiList ?? []), ...poiList],
+          isCompleted: countriesCount === countriesProcessed,
+        },
+        $inc: {
+          countriesProcessed: 1,
+        },
+      };
 
-    const update = {
-      $set: {
-        _id: id,
-        poiList: [...(currentSnapshot?.poiList ?? []), ...poiList],
-        isCompleted: countriesCount === countriesProcessed,
-      },
-      $inc: {
-        countriesProcessed: 1,
-      },
-    };
+      await repository.collections.poiListSnapshots.updateOne(filter, update, {
+        upsert: true,
+        session,
+      });
 
-    await repository.collections.poiListSnapshots.updateOne(filter, update, {
-      upsert: true,
-      session,
+      console.log(`[openChargeMapConsumer]: ${poiList.length} POIs stored in database`);
     });
 
-    console.log(`[openChargeMapConsumer]: ${poiList.length} POIs stored in database`);
-
-    await session.commitTransaction();
     channel.ack(msg);
   } catch (err) {
     console.error(`[openChargeMapConsumer]: ${err.message}`);

@@ -58,7 +58,7 @@ export const connectMessageQueue: () => MessageQueueConnection = async () => {
           consumerHandler(msg, channel);
         }
       },
-      { noAck: true },
+      { noAck: false },
     );
 
     console.log(`[messageQueue]: Consumer connected to ${env.RABBITMQ_QUEUE}`);
