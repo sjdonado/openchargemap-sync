@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "rootDirs": ["src", "__tests__"],
+    "outDir": "build",
+    "lib": ["es2022"],
+    "target": "es2022",
+    "module": "nodenext",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "strictNullChecks": true,
+    "sourceMap": true,
+    "types": ["node", "jest"]
+  },
+  "exclude": ["node_modules"]
+}
