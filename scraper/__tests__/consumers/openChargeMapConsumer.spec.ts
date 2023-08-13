@@ -1,3 +1,4 @@
+import { type ClientSession } from 'mongodb';
 import * as MUUID from 'uuid-mongodb';
 import type amqp from 'amqplib';
 
@@ -12,7 +13,6 @@ import { type ScraperMessage } from '../../src/publishers/openChargeMapPublisher
 import { mockRepository } from '../mocks/repository';
 import { generatePOIList } from '../fixtures/poiList';
 import { referenceData } from '../fixtures/referenceData';
-import { ClientSession } from 'mongodb';
 
 jest.mock('../../src/services/openChargeMap');
 

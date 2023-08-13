@@ -53,7 +53,7 @@ describe('GET /run ', () => {
   it('should return 200 when sending a GET request', async () => {
     const endpoint = '/run';
 
-    const POIList = generatePOIList(1);
+    const POIList = generatePOIList(10);
 
     const snapshots = await repository.collections.poiListSnapshots.find().toArray();
 

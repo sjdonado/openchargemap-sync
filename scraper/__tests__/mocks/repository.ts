@@ -14,8 +14,7 @@ export const mockRepository: jest.Mocked<Repository> = {
   },
   startDBSession: jest.fn(async () =>
     Promise.resolve({
-      // ts-ignore
-      withTransaction: jest.fn(async (callback) => await callback()),
+      withTransaction: jest.fn(async (callback: () => Promise<void>) => callback()),
       endSession: jest.fn(),
     } as unknown as jest.Mocked<ClientSession>),
   ),
