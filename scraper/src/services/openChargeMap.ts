@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 import env from '../config/env';
+import { POI_LIST_MAX_RESULTS } from '../config/constant';
 
 export type Country = {
   ID: number;
@@ -110,7 +111,7 @@ export const fetchPOIList = async (countryId: number) => {
   const response = await axios(endpoint, {
     params: {
       countryid: countryId,
-      maxresults: 10e4,
+      maxresults: POI_LIST_MAX_RESULTS,
     },
     headers: {
       'X-API-Key': env.OPENCHARGEMAP_API_KEY,

@@ -5,6 +5,7 @@ import { type Repository } from '../../src/router';
 
 import { start } from '../../src/server';
 import env, { type EnvVariables } from '../../src/config/env';
+import { POI_LIST_MAX_RESULTS } from '../../src/config/constant';
 
 import { referenceData } from '../fixtures/referenceData';
 import { generatePOIList } from '../fixtures/poiList';
@@ -53,12 +54,29 @@ describe('GET /run ', () => {
   it('should return 200 when sending a GET request', async () => {
     const endpoint = '/run';
 
-    const POIList = generatePOIList(10);
+    const POIList = generatePOIList(100);
 
     const snapshots = await repository.collections.poiListSnapshots.find().toArray();
+    const pois = await repository.collections.pois.find().toArray();
 
     mock.onGet(`${env.OPENCHARGEMAP_BASE_URL}/referencedata`).reply(200, referenceData);
-    mock.onGet(`${env.OPENCHARGEMAP_BASE_URL}/poi`).reply(200, POIList);
+    mock
+      .onGet(`${env.OPENCHARGEMAP_BASE_URL}/poi`, {
+        params: {
+          countryid: referenceData.Countries[1].ID,
+          maxresults: POI_LIST_MAX_RESULTS,
+        },
+      })
+      .reply(200, POIList);
+
+    mock
+      .onGet(`${env.OPENCHARGEMAP_BASE_URL}/poi`, {
+        params: {
+          countryid: referenceData.Countries[2].ID,
+          maxresults: POI_LIST_MAX_RESULTS,
+        },
+      })
+      .reply(200, POIList);
 
     const response = await fetch({
       method: 'GET',
@@ -71,12 +89,19 @@ describe('GET /run ', () => {
 
     const snapshotsAfter = await repository.collections.poiListSnapshots.find().toArray();
 
+    const poisAfter = await repository.collections.pois.find().toArray();
+
     expect(response.status).toBe(200);
     expect(response.headers['content-type']).toContain('application/json');
     expect(response.data.message).toContain('Job started');
 
     expect(snapshotsAfter.length).toBeGreaterThan(snapshots.length);
-    expect(snapshotsAfter[snapshotsAfter.length - 1].poiList.length).toBe(
+    expect(snapshotsAfter[snapshotsAfter.length - 1].poiListIds.length).toBe(
+      POIList.length * (referenceData.Countries.length - 1),
+    );
+
+    expect(poisAfter.length).toBeGreaterThan(pois.length);
+    expect(poisAfter.length - pois.length).toBe(
       POIList.length * (referenceData.Countries.length - 1),
     );
   });
