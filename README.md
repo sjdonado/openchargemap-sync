@@ -62,6 +62,15 @@ $ eslint . --ext .ts
 ```
 
 ## How to run
-1. `docker-compose up`
-2. `yarn --cwd scraper dev`
 
+1. Create `.env` file following `.env.example`
+
+2. Run docker-compose
+```bash
+./start.sh
+```
+
+3. Run services
+```bash
+yarn --cwd scraper dev
+```
