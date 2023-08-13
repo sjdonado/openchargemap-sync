@@ -9,7 +9,7 @@ import { KeyvAdapter } from '@apollo/utils.keyvadapter';
 import { loadFilesSync } from '@graphql-tools/load-files';
 
 import env from './config/env';
-import { type Repository } from './types';
+import { type Repository } from './@types';
 
 import { connectDatabase } from './repository/database';
 

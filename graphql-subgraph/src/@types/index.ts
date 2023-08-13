@@ -1,6 +1,6 @@
 import type * as MUUID from 'uuid-mongodb';
 
-import { type DatabaseCollections } from './repository/database';
+import { type DatabaseCollections } from '../repository/database';
 
 export type POIListSnapshot = {
   _id: MUUID.MUUID;
@@ -71,6 +71,18 @@ type ConnectionType = {
   IsObsolete: boolean;
 };
 
+type Level = {
+  ID: number;
+  Title: string;
+  Comments: string;
+  IsFastChargeCapable: boolean;
+};
+
+type CurrentType = {
+  ID: number;
+  Title?: string;
+};
+
 type Connection = {
   ID: number;
   ConnectionTypeID: number;
@@ -79,12 +91,12 @@ type Connection = {
   StatusTypeID: number;
   StatusType: StatusType;
   LevelID: number;
-  Level: any;
+  Level: Level;
   Amps?: number;
   Voltage?: number;
   PowerKW: number;
   CurrentTypeID: number;
-  CurrentType: any;
+  CurrentType: CurrentType;
   Quantity: number;
   Comments?: string;
 };
