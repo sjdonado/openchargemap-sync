@@ -1,8 +1,10 @@
 import { type DocumentNode } from 'graphql';
+import Keyv from 'keyv';
 
 import { ApolloServer } from '@apollo/server';
 import { buildSubgraphSchema } from '@apollo/subgraph';
 import { startStandaloneServer } from '@apollo/server/standalone';
+import { KeyvAdapter } from '@apollo/utils.keyvadapter';
 
 import { loadFilesSync } from '@graphql-tools/load-files';
 
@@ -17,6 +19,7 @@ const typeDefs = loadFilesSync<DocumentNode>('./src/schemas/*.graphql');
 
 const server = new ApolloServer({
   schema: buildSubgraphSchema({ typeDefs, resolvers }),
+  cache: new KeyvAdapter(new Keyv(env.REDIS_URI)),
 });
 
 (async () => {
