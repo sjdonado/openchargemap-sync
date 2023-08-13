@@ -9,7 +9,6 @@ import {
 } from '../../src/publishers/openChargeMapPublisher';
 
 import { mockRepository } from '../mocks/repository';
-import { mockMUUID } from '../mocks/muuid';
 
 jest.mock('uuid-mongodb', () => {
   const actual: jest.Mocked<typeof MUUID> = jest.requireActual('uuid-mongodb');

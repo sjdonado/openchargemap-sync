@@ -17,15 +17,20 @@ const router: Router = {
   [Routes.RUN]: runController,
 };
 
-export const start = async (port = env.PORT) => {
-  const [collections, disconnectDatabase] = await connectDatabase();
+export const start = async () => {
+  const [
+    collections, //
+    startDBSession,
+    disconnectDatabase,
+  ] = await connectDatabase();
+
   const [
     startConsumer, //
     publishMessage,
     disconnectChannel,
   ] = await connectMessageQueue();
 
-  const repository: Repository = { collections, publishMessage };
+  const repository: Repository = { collections, startDBSession, publishMessage };
 
   startConsumer(env.RABBITMQ_QUEUE, async (msg, channel) =>
     openChargeMapConsumer(msg, channel, repository),
@@ -57,8 +62,8 @@ export const start = async (port = env.PORT) => {
       });
     });
 
-  server.listen(port, () => {
-    console.log(`[server] listening on PORT ${port}`);
+  server.listen(env.PORT, () => {
+    console.log(`[server] listening on PORT ${env.PORT}`);
   });
 
   return [repository, disconnect] as [Repository, () => Promise<void>];
