@@ -2,24 +2,34 @@ import * as http from 'http';
 
 import env from './config/env';
 
-import { Routes, type Router } from './router';
+import { Routes, type Router, type Repository } from './router';
 
 import { connectDatabase } from './repository/database';
 import { connectMessageQueue } from './repository/messageQueue';
 
 import { healthController } from './controllers/health';
+import { runController } from './controllers/run';
+
 import { openChargeMapConsumer } from './consumers/openChargeMapConsumer';
 
 const router: Router = {
   [Routes.HEALTH]: healthController,
+  [Routes.RUN]: runController,
 };
 
-async function main() {
+export const start = async (port = env.PORT) => {
   const [collections, disconnectDatabase] = await connectDatabase();
-  const [startConsumer, publishMessage, disconnectChannel] =
-    await connectMessageQueue();
+  const [
+    startConsumer, //
+    publishMessage,
+    disconnectChannel,
+  ] = await connectMessageQueue();
 
-  startConsumer(env.RABBITMQ_QUEUE, openChargeMapConsumer);
+  const repository: Repository = { collections, publishMessage };
+
+  startConsumer(env.RABBITMQ_QUEUE, async (msg, channel) =>
+    openChargeMapConsumer(msg, channel, repository),
+  );
 
   const server = http.createServer(async (req, res) => {
     if (!(`${req.url}` in router)) {
@@ -31,7 +41,7 @@ async function main() {
 
     const endpoint = req.url as Routes;
 
-    await router[endpoint](req, res, { collections, publishMessage });
+    await router[endpoint](req, res, repository);
   });
 
   server.on('close', async () => {
@@ -39,12 +49,17 @@ async function main() {
     await disconnectChannel();
   });
 
-  server.listen(env.PORT, () => {
-    console.log(`Server listening on PORT ${env.PORT}`);
-  });
-}
+  const disconnect = async () =>
+    new Promise<void>((resolve) => {
+      server.close(() => {
+        console.log('[server]: closed');
+        resolve();
+      });
+    });
 
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+  server.listen(port, () => {
+    console.log(`[server] listening on PORT ${port}`);
+  });
+
+  return [repository, disconnect] as [Repository, () => Promise<void>];
+};

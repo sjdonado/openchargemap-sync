@@ -1,38 +1,27 @@
-import * as http from 'http';
-
-import sinon from 'sinon';
-
-import { type Repository } from '../../src/router';
 import { healthController } from '../../src/controllers/health';
 
+import { mockReq, mockRes } from '../mocks/http';
+import { mockRepository } from '../mocks/repository';
+
 describe('healthController', () => {
-  const req = sinon.createStubInstance(http.IncomingMessage);
-  const res = sinon.createStubInstance(http.ServerResponse);
-  const repository = {
-    collections: {
-      poiListSnapshots: {
-        countDocuments: async () => Promise.resolve(1),
-      },
-    },
-  } as Repository;
-
   it('should return a healthy response', async () => {
-    await healthController(req, res, repository);
+    const snapshotsCount = 1;
 
-    sinon.assert.calledWith(
-      res.writeHead,
-      200,
-      sinon.match({
-        'Content-Type': 'application/json',
-      }),
-    );
+    const expectedResponse = {
+      status: 'ok',
+      message: `Service is healthy, number of snapshots: ${snapshotsCount}`,
+    };
 
-    sinon.assert.calledWith(
-      res.end,
-      JSON.stringify({
-        status: 'ok',
-        message: `Service is healthy, number of snapshots: 1`,
-      }),
-    );
+    (
+      mockRepository.collections.poiListSnapshots.countDocuments as jest.Mock
+    ).mockResolvedValue(snapshotsCount);
+
+    await healthController(mockReq, mockRes, mockRepository);
+
+    expect(mockRes.writeHead).toBeCalledWith(200, {
+      'Content-Type': 'application/json',
+    });
+
+    expect(mockRes.end).toBeCalledWith(JSON.stringify(expectedResponse));
   });
 });

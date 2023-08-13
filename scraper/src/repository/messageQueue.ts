@@ -2,19 +2,19 @@ import amqp from 'amqplib';
 
 import env from '../config/env';
 
-export type ConsumerHandler = (
+import { type Repository } from '../router';
+
+export type Consumer = (
   msg: amqp.ConsumeMessage,
   channel: amqp.Channel,
-) => void;
+  repository?: Repository,
+) => Promise<void>;
 
-export type PublishMessage = (
-  exchangeName: string,
-  message: string,
-) => Promise<boolean>;
+export type PublishMessage = (exchangeName: string, message: string) => Promise<boolean>;
 
 type MessageQueueConnection = Promise<
   [
-    (queueName: string, consumerHandler: ConsumerHandler) => void,
+    (queueName: string, consumerHandler: Consumer) => void,
     PublishMessage,
     () => Promise<void>,
   ]
@@ -41,13 +41,11 @@ export const connectMessageQueue: () => MessageQueueConnection = async () => {
   await channel.bindQueue(env.RABBITMQ_DLQ, env.RABBITMQ_DLX, '');
   await channel.bindQueue(env.RABBITMQ_QUEUE, env.RABBITMQ_EXCHANGE, '');
 
-  const startConsumer = (
-    queueName: string,
-    consumerHandler: ConsumerHandler,
-  ) => {
+  const startConsumer = (queueName: string, consumerHandler: Consumer) => {
     // eslint-disable-next-line
     channel.consume(queueName, (msg: amqp.ConsumeMessage | null) => {
       if (msg !== null) {
+        // eslint-disable-next-line
         consumerHandler(msg, channel);
       }
     });
