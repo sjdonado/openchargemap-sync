@@ -1,15 +1,9 @@
-import { composeResolvers } from '@graphql-tools/resolvers-composition';
+import poisResolver from './pois';
 
-import poisResolver from './resolvers/pois.resolver';
-
-const resolvers: Resolvers = {
-  ...poisResolver,
+const resolvers = {
+  Query: {
+    ...poisResolver.Query,
+  },
 };
 
-const resolversComposition = {
-  'Query.pois': [],
-};
-
-const composedResolvers = composeResolvers(resolvers, resolversComposition);
-
-export default composedResolvers;
+export default resolvers;
