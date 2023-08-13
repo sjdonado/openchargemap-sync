@@ -12,6 +12,7 @@ import { type ScraperMessage } from '../../src/publishers/openChargeMapPublisher
 import { mockRepository } from '../mocks/repository';
 import { generatePOIList } from '../fixtures/poiList';
 import { referenceData } from '../fixtures/referenceData';
+import { ClientSession } from 'mongodb';
 
 jest.mock('../../src/services/openChargeMap');
 
@@ -71,9 +72,14 @@ describe('openChargeMapConsumer', () => {
 
     expect(fetchPOIList).toHaveBeenCalledWith(message.country.ID);
 
-    expect(mockRepository.collections.poiListSnapshots.findOne).toHaveBeenCalledWith({
-      _id: snapshotIdBase64,
-    });
+    expect(mockRepository.collections.poiListSnapshots.findOne).toHaveBeenCalledWith(
+      {
+        _id: snapshotIdBase64,
+      },
+      {
+        session: expect.any(Object) as jest.Mocked<ClientSession>,
+      },
+    );
 
     expect(mockRepository.collections.poiListSnapshots.updateOne).toHaveBeenCalledWith(
       {
@@ -83,12 +89,15 @@ describe('openChargeMapConsumer', () => {
         $set: {
           _id: snapshotIdBase64,
           poiList: POIList,
-          countriesProcessed: 1,
           isCompleted: false,
+        },
+        $inc: {
+          countriesProcessed: 1,
         },
       },
       {
         upsert: true,
+        session: expect.any(Object) as jest.Mocked<ClientSession>,
       },
     );
     expect(mockChannel.ack).toHaveBeenCalledWith(mockMsg);
@@ -120,9 +129,14 @@ describe('openChargeMapConsumer', () => {
 
     expect(fetchPOIList).toHaveBeenCalledWith(message.country.ID);
 
-    expect(mockRepository.collections.poiListSnapshots.findOne).toHaveBeenCalledWith({
-      _id: snapshotIdBase64,
-    });
+    expect(mockRepository.collections.poiListSnapshots.findOne).toHaveBeenCalledWith(
+      {
+        _id: snapshotIdBase64,
+      },
+      {
+        session: expect.any(Object) as jest.Mocked<ClientSession>,
+      },
+    );
 
     expect(mockRepository.collections.poiListSnapshots.updateOne).toHaveBeenCalledWith(
       {
@@ -132,12 +146,15 @@ describe('openChargeMapConsumer', () => {
         $set: {
           _id: snapshotIdBase64,
           poiList: [...currentSnapshot.poiList, ...POIList],
-          countriesProcessed: 2,
           isCompleted: true,
+        },
+        $inc: {
+          countriesProcessed: 1,
         },
       },
       {
         upsert: true,
+        session: expect.any(Object) as jest.Mocked<ClientSession>,
       },
     );
     expect(mockChannel.ack).toHaveBeenCalledWith(mockMsg);

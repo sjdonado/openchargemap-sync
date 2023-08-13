@@ -76,8 +76,8 @@ describe('GET /run ', () => {
     expect(response.data.message).toContain('Job started');
 
     expect(snapshotsAfter.length).toBeGreaterThan(snapshots.length);
-    expect(snapshotsAfter[snapshots.length - 1].poiList.length).toBe(
-      POIList.length * referenceData.Countries.length,
+    expect(snapshotsAfter[snapshotsAfter.length - 1].poiList.length).toBe(
+      POIList.length * (referenceData.Countries.length - 1),
     );
   });
 });
