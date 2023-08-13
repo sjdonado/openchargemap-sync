@@ -6,27 +6,28 @@
     "build": "tsc --p tsconfig.prod.json",
     "start": "node ./dist/bin/index.js",
     "dev": "tsc-watch --onSuccess \"node ./build/src/bin/index.js\"",
-    "test": "jest --detectOpenHandles"
+    "test": "jest --detectOpenHandles",
+    "lint": "eslint . --ext .ts"
   },
   "keywords": [],
   "author": "sjdonado",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "@types/amqplib": "^0.10.1",
     "amqplib": "^0.10.3",
+    "axios": "^1.4.0",
     "dotenv": "^16.3.1",
     "mongodb": "^5.7.0",
     "uuid-mongodb": "^2.5.4"
   },
   "devDependencies": {
     "@faker-js/faker": "^8.0.2",
+    "@types/amqplib": "^0.10.1",
     "@types/axios-mock-adapter": "^1.10.0",
     "@types/jest": "^29.5.3",
     "@types/node": "^20.4.9",
     "@typescript-eslint/eslint-plugin": ">=6.0.0",
     "@typescript-eslint/parser": ">=6.0.0",
-    "axios": "^1.4.0",
     "axios-mock-adapter": "^1.21.5",
     "eslint": ">=8.0.0",
     "eslint-config-prettier": "^9.0.0",
