@@ -8,13 +8,13 @@ import { type ScraperMessage } from '../publishers/openChargeMapPublisher';
 
 export type POIListSnapshot = {
   _id: MUUID.MUUID;
-  poiListIds: string[];
+  poiListIds: MUUID.MUUID[];
   countriesProcessed: number;
   isCompleted: boolean;
 };
 
 export type POIDocument = POI & {
-  _id: string;
+  _id: MUUID.MUUID;
 };
 
 export const openChargeMapConsumer: Consumer = async (msg, channel, repository) => {
@@ -25,7 +25,7 @@ export const openChargeMapConsumer: Consumer = async (msg, channel, repository) 
   const session = await repository.startDBSession();
 
   try {
-    const filter = { _id: id };
+    const filter = { _id: MUUID.from(id) };
 
     const poiList = await fetchPOIList(country.ID);
 
@@ -38,12 +38,12 @@ export const openChargeMapConsumer: Consumer = async (msg, channel, repository) 
       const chunckedPoiListInsertedIds = await Promise.all(
         chunkedPOIList.map(async (poiListChunk) => {
           const poiListChunkWithIds: POIDocument[] = poiListChunk.map((poi) => ({
-            _id: MUUID.v4().toString('base64'),
+            _id: MUUID.v4(),
             ...poi,
           }));
 
           const { insertedIds } = await repository.collections.pois.insertMany(
-            // @ts-expect-error _id is a string already
+            // @ts-expect-error _id is a valid field
             poiListChunkWithIds,
             {
               session,
@@ -65,7 +65,7 @@ export const openChargeMapConsumer: Consumer = async (msg, channel, repository) 
 
       const update = {
         $set: {
-          _id: id,
+          _id: filter._id,
           poiListIds: [...(currentSnapshot?.poiListIds ?? []), ...poiListChunkIds],
           isCompleted: countriesCount === countriesProcessed,
         },
@@ -86,7 +86,7 @@ export const openChargeMapConsumer: Consumer = async (msg, channel, repository) 
 
     channel.ack(msg);
   } catch (err) {
-    console.error(`[openChargeMapConsumer]: ${err.message}`);
+    console.error('[openChargeMapConsumer]', err);
   } finally {
     await session.endSession();
   }

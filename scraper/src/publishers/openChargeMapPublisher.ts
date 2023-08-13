@@ -6,7 +6,7 @@ import { type Repository } from '../router';
 import { type Country } from '../services/openChargeMap';
 
 export type ScraperMessage = {
-  id: MUUID.MUUID;
+  id: string;
   country: Country;
   countriesCount: number;
 };
@@ -20,7 +20,7 @@ export const openChargeMapPublisher = async (
   await Promise.all(
     countries.map(async (country) => {
       const message: ScraperMessage = {
-        id,
+        id: id.toString('D'),
         country,
         countriesCount: countries.length,
       };
@@ -28,7 +28,8 @@ export const openChargeMapPublisher = async (
       await repository.publishMessage(env.RABBITMQ_EXCHANGE, JSON.stringify(message));
 
       console.log(
-        `[openChargeMapPublisher]: ${id.toString('D')} ${country.ISOCode} - ${countries.length
+        `[openChargeMapPublisher]: ${id.toString('D')} ${country.ISOCode} - ${
+          countries.length
         }`,
       );
     }),
