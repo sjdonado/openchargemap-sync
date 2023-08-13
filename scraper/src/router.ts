@@ -1,4 +1,5 @@
 import type * as http from 'http';
+import { type ClientSession } from 'mongodb';
 
 import { type DatabaseCollections } from './repository/database';
 
@@ -6,6 +7,7 @@ import { type PublishMessage } from './repository/messageQueue';
 
 export type Repository = {
   collections: DatabaseCollections;
+  startDBSession: () => Promise<ClientSession>;
   publishMessage: PublishMessage;
 };
 

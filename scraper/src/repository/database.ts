@@ -1,4 +1,4 @@
-import { MongoClient, type Collection } from 'mongodb';
+import { MongoClient, type Collection, type ClientSession } from 'mongodb';
 
 import env from '../config/env';
 
@@ -6,12 +6,16 @@ export type DatabaseCollections = {
   poiListSnapshots: Collection;
 };
 
-export type DatabaseConnection = Promise<[DatabaseCollections, () => Promise<void>]>;
+export type DatabaseConnection = Promise<
+  [DatabaseCollections, () => Promise<ClientSession>, () => Promise<void>]
+>;
 
 export async function connectDatabase(): DatabaseConnection {
   const client = new MongoClient(env.MONGO_URI);
 
   await client.connect();
+
+  const startDBSession = async () => client.startSession();
 
   const disconnect = async () => client.close();
 
@@ -21,5 +25,5 @@ export async function connectDatabase(): DatabaseConnection {
 
   console.log(`[database]: Connected to ${env.MONGO_URI}`);
 
-  return [collections, disconnect];
+  return [collections, startDBSession, disconnect];
 }

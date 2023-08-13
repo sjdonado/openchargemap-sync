@@ -7,14 +7,19 @@ import { type Repository } from '../router';
 export type Consumer = (
   msg: amqp.ConsumeMessage,
   channel: amqp.Channel,
-  repository?: Repository,
+  repository: Repository,
+) => Promise<void>;
+
+export type ConsumerHandler = (
+  msg: amqp.ConsumeMessage,
+  channel: amqp.Channel,
 ) => Promise<void>;
 
 export type PublishMessage = (exchangeName: string, message: string) => Promise<boolean>;
 
 type MessageQueueConnection = Promise<
   [
-    (queueName: string, consumerHandler: Consumer) => void,
+    (queueName: string, consumerHandler: ConsumerHandler) => void,
     PublishMessage,
     () => Promise<void>,
   ]
@@ -30,6 +35,7 @@ export const connectMessageQueue: () => MessageQueueConnection = async () => {
     durable: true,
     arguments: {
       'x-dead-letter-exchange': env.RABBITMQ_DLX,
+      'x-single-active-consumer': true,
     },
   });
 
@@ -41,14 +47,19 @@ export const connectMessageQueue: () => MessageQueueConnection = async () => {
   await channel.bindQueue(env.RABBITMQ_DLQ, env.RABBITMQ_DLX, '');
   await channel.bindQueue(env.RABBITMQ_QUEUE, env.RABBITMQ_EXCHANGE, '');
 
-  const startConsumer = (queueName: string, consumerHandler: Consumer) => {
+  const startConsumer = (queueName: string, consumerHandler: ConsumerHandler) => {
     // eslint-disable-next-line
-    channel.consume(queueName, (msg: amqp.ConsumeMessage | null) => {
-      if (msg !== null) {
-        // eslint-disable-next-line
-        consumerHandler(msg, channel);
-      }
-    });
+    channel.consume(
+      queueName,
+      // eslint-disable-next-line
+      (msg: amqp.ConsumeMessage | null) => {
+        if (msg !== null) {
+          // eslint-disable-next-line
+          consumerHandler(msg, channel);
+        }
+      },
+      { noAck: true },
+    );
 
     console.log(`[messageQueue]: Consumer connected to ${env.RABBITMQ_QUEUE}`);
   };

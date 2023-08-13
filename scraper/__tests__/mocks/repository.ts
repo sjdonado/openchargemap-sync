@@ -12,5 +12,6 @@ export const mockRepository: jest.Mocked<Repository> = {
       deleteOne: jest.fn(),
     } as unknown as jest.Mocked<Collection>,
   },
+  startDBSession: jest.fn(),
   publishMessage: jest.fn(),
 };
