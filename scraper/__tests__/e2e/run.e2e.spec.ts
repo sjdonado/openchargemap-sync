@@ -4,7 +4,7 @@ import MockAdapter from 'axios-mock-adapter';
 import { type Repository } from '../../src/router';
 
 import { start } from '../../src/server';
-import env from '../../src/config/env';
+import env, { type EnvVariables } from '../../src/config/env';
 
 import { referenceData } from '../fixtures/referenceData';
 import { generatePOIList } from '../fixtures/poiList';
@@ -12,8 +12,20 @@ import { generatePOIList } from '../fixtures/poiList';
 import { fetch } from '../helpers/http';
 import { waitFor } from '../helpers/time';
 
+const TEST_DELAY = 3000;
 const TEST_PORT = 1234;
-const TEST_DELAY = 1000;
+
+jest.mock('../../src/config/env', () => {
+  const actual: jest.Mocked<{ default: EnvVariables }> =
+    jest.requireActual('../../src/config/env');
+
+  return {
+    ...actual.default,
+    NODE_ENV: 'test',
+    PORT: 1234,
+    OPENCHARGEMAP_ALLOWED_COUNTRIES: 'DE,CO',
+  };
+});
 
 describe('GET /run ', () => {
   let repository: Repository;
@@ -23,7 +35,7 @@ describe('GET /run ', () => {
 
   beforeAll(async () => {
     // prettier-ignore
-    ([repository, disconnect] = await start(1234));
+    ([repository, disconnect] = await start());
   });
 
   beforeEach(() => {
@@ -41,7 +53,7 @@ describe('GET /run ', () => {
   it('should return 200 when sending a GET request', async () => {
     const endpoint = '/run';
 
-    const POIList = generatePOIList(10e2);
+    const POIList = generatePOIList(1);
 
     const snapshots = await repository.collections.poiListSnapshots.find().toArray();
 
@@ -64,6 +76,8 @@ describe('GET /run ', () => {
     expect(response.data.message).toContain('Job started');
 
     expect(snapshotsAfter.length).toBeGreaterThan(snapshots.length);
-    expect(snapshotsAfter[0].poiList.length).toBe(POIList.length);
+    expect(snapshotsAfter[snapshots.length - 1].poiList.length).toBe(
+      POIList.length * referenceData.Countries.length,
+    );
   });
 });

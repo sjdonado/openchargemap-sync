@@ -16,5 +16,11 @@ export const referenceData: CoreReferenceData = {
       ContinentCode: 'EU',
       Title: 'Germany',
     },
+    {
+      ID: 53,
+      ISOCode: 'CO',
+      ContinentCode: 'SA',
+      Title: 'Colombia',
+    },
   ],
 };

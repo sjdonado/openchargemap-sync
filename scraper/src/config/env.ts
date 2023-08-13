@@ -1,6 +1,6 @@
 import 'dotenv/config';
 
-type Config = {
+export type EnvVariables = {
   NODE_ENV: string;
   PORT: number;
   MONGO_URI: string;
@@ -14,7 +14,7 @@ type Config = {
   OPENCHARGEMAP_ALLOWED_COUNTRIES: string;
 };
 
-const config: Config = {
+const env: EnvVariables = {
   NODE_ENV: process.env.NODE_ENV ?? 'development',
   PORT: Number(process.env.PORT ?? '3000'),
   MONGO_URI: process.env.MONGO_URI!,
@@ -28,4 +28,4 @@ const config: Config = {
   OPENCHARGEMAP_ALLOWED_COUNTRIES: process.env.OPENCHARGEMAP_ALLOWED_COUNTRIES!,
 };
 
-export default config;
+export default env;
