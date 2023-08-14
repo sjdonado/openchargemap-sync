@@ -1,5 +1,7 @@
 import { type FormattedExecutionResult } from 'graphql';
+
 import { type DatabaseCollections } from '../repository/database';
+import { type PageInfoArgs } from './pagination';
 
 export type Repository = {
   collections: DatabaseCollections;
@@ -8,6 +10,12 @@ export type Repository = {
 export type CustomContext = {
   repository: Repository;
 };
+
+export type CustomResolver<T> = (
+  parent: unknown,
+  args: PageInfoArgs,
+  context: CustomContext,
+) => Promise<T>;
 
 export type GraphQLSingleResult<T> = {
   body: {

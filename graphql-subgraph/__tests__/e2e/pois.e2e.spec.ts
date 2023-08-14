@@ -32,21 +32,32 @@ describe('POST /', () => {
     await disconnect();
   });
 
-  it('should return a list of POIs', async () => {
+  it('should return a list of POIs - without pagination', async () => {
     const query = `#graphql
-      query pois {
+      query GetPois {
         pois {
-          StatusType {
-            ID
+          edges {
+            cursor
+            node {
+              StatusType {
+                ID
+              }
+              AddressInfo {
+                ID
+              }
+              Connections {
+                ID
+              }
+              OperatorInfo {
+                ID
+              }
+            }
           }
-          AddressInfo {
-            ID
-          }
-          Connections {
-            ID
-          }
-          OperatorInfo {
-            ID
+          pageInfo {
+            hasNextPage
+            hasPreviousPage
+            startCursor
+            endCursor
           }
         }
       }
@@ -57,8 +68,65 @@ describe('POST /', () => {
     expect(response.status).toBe(200);
     expect(response.body.data).toBeDefined();
 
-    expect(response.body.data.pois.length).toBeGreaterThan(0);
-    expect(response.body.data.pois[0]).toMatchObject({
+    expect(response.body.data.pois.edges.length).toBeGreaterThan(0);
+    expect(response.body.data.pois.edges[0].node).toMatchObject({
+      StatusType: {
+        ID: expect.any(Number) as jest.Mocked<number>,
+      },
+      AddressInfo: {
+        ID: expect.any(Number) as jest.Mocked<number>,
+      },
+      Connections: expect.arrayContaining([
+        {
+          ID: expect.any(Number) as jest.Mocked<number>,
+        },
+      ]) as jest.Mocked<Connection[]>,
+      OperatorInfo: {
+        ID: expect.any(Number) as jest.Mocked<number>,
+      },
+    });
+  });
+
+  it('should return a list of POIs - with pagination', async () => {
+    const query = `#graphql
+      query GetPois($first: Int, $after: String, $last: Int, $before: String) {
+        pois(first: $first, after: $after, last: $last, before: $before) {
+          edges {
+            cursor
+            node {
+              StatusType {
+                ID
+              }
+              AddressInfo {
+                ID
+              }
+              Connections {
+                ID
+              }
+              OperatorInfo {
+                ID
+              }
+            }
+          }
+          pageInfo {
+            hasNextPage
+            hasPreviousPage
+            startCursor
+            endCursor
+          }
+        }
+      }
+    `;
+
+    const response = await request(TEST_BASE_URL)
+      .post('/')
+      .send({ query, variables: { first: 2 } });
+
+    expect(response.status).toBe(200);
+    expect(response.body.data).toBeDefined();
+
+    expect(response.body.data.pois.edges.length).toBe(2);
+    expect(response.body.data.pois.edges[0].node).toMatchObject({
       StatusType: {
         ID: expect.any(Number) as jest.Mocked<number>,
       },

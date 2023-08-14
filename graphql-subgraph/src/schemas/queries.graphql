@@ -1,0 +1,13 @@
+type Query {
+  pois(first: Int, after: String, last: Int, before: String): PoisConnection!
+}
+
+type PoisConnection {
+  edges: [POIEdge!]!
+  pageInfo: PageInfo!
+}
+
+type POIEdge {
+  cursor: String!
+  node: POI!
+}
