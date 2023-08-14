@@ -2,6 +2,8 @@ import { type POI } from '../@types/pois';
 import { type POIListSnapshot } from '../@types/poiListSnapshot';
 import { type Repository } from '../@types/server';
 
+import { PAGINATION_MAX_ITEMS } from '../config/constants';
+
 import { serializePOIList } from '../serializers/poi';
 
 export default {
@@ -26,6 +28,7 @@ export default {
           // @ts-expect-error _id is a valid field
           _id: { $in: latestSnapshot.poiListIds },
         })
+        .limit(PAGINATION_MAX_ITEMS)
         .toArray();
 
       return serializePOIList(poiListFromLatestSnapshot);

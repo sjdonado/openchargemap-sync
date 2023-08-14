@@ -34,7 +34,7 @@ type AddressInfo {
   AccessComments: String
   RelatedURL: String
   Distance: Float
-  DistanceUnit: Int!
+  DistanceUnit: Float!
 }
 
 type OperatorInfo {
@@ -84,7 +84,7 @@ type Connection {
   ConnectionTypeID: Float!
   ConnectionType: ConnectionType!
   Reference: String
-  StatusTypeID: Int!
+  StatusTypeID: Float!
   StatusType: StatusType!
   LevelID: Float!
   Level: Level!
@@ -93,7 +93,7 @@ type Connection {
   PowerKW: Float!
   CurrentTypeID: Float!
   CurrentType: CurrentType!
-  Quantity: Int!
+  Quantity: Float!
   Comments: String
 }
 
