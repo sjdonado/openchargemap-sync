@@ -1,15 +1,10 @@
 import * as MUUID from 'uuid-mongodb';
 
+import { type Repository } from '../@types/server';
+import { type Country } from '../@types/poi';
+import { type ScraperMessage } from '../@types/scraper';
+
 import env from '../config/env';
-
-import { type Repository } from '../router';
-import { type Country } from '../services/openChargeMap';
-
-export type ScraperMessage = {
-  id: string;
-  country: Country;
-  countriesCount: number;
-};
 
 export const openChargeMapPublisher = async (
   countries: Country[],

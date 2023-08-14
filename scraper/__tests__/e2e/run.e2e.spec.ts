@@ -2,10 +2,10 @@ import axios from 'axios';
 import request from 'supertest';
 import MockAdapter from 'axios-mock-adapter';
 
-import { type Repository } from '../../src/router';
+import { type Repository, type EnvVariables } from '../../src/@types/server';
 
+import env from '../../src/config/env';
 import { start } from '../../src/server';
-import env, { type EnvVariables } from '../../src/config/env';
 import { POI_LIST_MAX_RESULTS } from '../../src/config/constant';
 
 import { referenceData } from '../fixtures/referenceData';

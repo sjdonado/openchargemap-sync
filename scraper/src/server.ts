@@ -1,8 +1,9 @@
 import * as http from 'http';
 
-import env from './config/env';
+import { type Repository } from './@types/server';
 
-import { Routes, type Router, type Repository } from './router';
+import env from './config/env';
+import { Routes, type Router } from './@types/router';
 
 import { connectDatabase } from './repository/database';
 import { connectMessageQueue } from './repository/messageQueue';

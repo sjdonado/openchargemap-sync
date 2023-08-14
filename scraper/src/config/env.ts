@@ -1,18 +1,6 @@
 import 'dotenv/config';
 
-export type EnvVariables = {
-  NODE_ENV: string;
-  PORT: number;
-  MONGO_URI: string;
-  RABBITMQ_URI: string;
-  RABBITMQ_QUEUE: string;
-  RABBITMQ_EXCHANGE: string;
-  RABBITMQ_DLX: string;
-  RABBITMQ_DLQ: string;
-  OPENCHARGEMAP_BASE_URL: string;
-  OPENCHARGEMAP_API_KEY: string;
-  OPENCHARGEMAP_ALLOWED_COUNTRIES: string;
-};
+import { type EnvVariables } from '../@types/server';
 
 const env: EnvVariables = {
   NODE_ENV: process.env.NODE_ENV ?? 'development',

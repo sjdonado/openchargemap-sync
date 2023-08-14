@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
 
-import { type POI } from '../../src/services/openChargeMap';
+import { type POI } from '../../src/@types/poi';
 
 const AddressInfo = {
   ID: faker.number.int(),

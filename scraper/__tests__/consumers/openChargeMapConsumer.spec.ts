@@ -4,13 +4,11 @@ import type amqp from 'amqplib';
 
 import { faker } from '@faker-js/faker';
 
-import {
-  type POIListSnapshot,
-  openChargeMapConsumer,
-} from '../../src/consumers/openChargeMapConsumer';
-import { fetchPOIList } from '../../src/services/openChargeMap';
+import { type ScraperMessage } from '../../src/@types/scraper';
+import { type POIListSnapshot } from '../../src/@types/poi';
 
-import { type ScraperMessage } from '../../src/publishers/openChargeMapPublisher';
+import { openChargeMapConsumer } from '../../src/consumers/openChargeMapConsumer';
+import { fetchPOIList } from '../../src/services/openChargeMap';
 
 import { mockRepository } from '../mocks/repository';
 import { generatePOIList } from '../fixtures/poiList';

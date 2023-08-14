@@ -1,6 +1,6 @@
 import { type ClientSession, type Collection } from 'mongodb';
 
-import { type Repository } from '../../src/router';
+import { type Repository } from '../../src/@types/server';
 
 const mockCollection = {
   countDocuments: jest.fn(),

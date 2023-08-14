@@ -1,21 +1,12 @@
 import * as _ from 'lodash';
 import * as MUUID from 'uuid-mongodb';
-import { type Consumer } from '../repository/messageQueue';
+
+import { type Consumer } from '../@types/server';
+import { type POIDocument, type POI, type POIListSnapshot } from '../@types/poi';
+import { type ScraperMessage } from '../@types/scraper';
 
 import { POI_LIST_CHUNK_SIZE } from '../config/constant';
-import { fetchPOIList, type POI } from '../services/openChargeMap';
-import { type ScraperMessage } from '../publishers/openChargeMapPublisher';
-
-export type POIListSnapshot = {
-  _id: MUUID.MUUID;
-  poiListIds: MUUID.MUUID[];
-  countriesProcessed: number;
-  isCompleted: boolean;
-};
-
-export type POIDocument = POI & {
-  _id: MUUID.MUUID;
-};
+import { fetchPOIList } from '../services/openChargeMap';
 
 export const openChargeMapConsumer: Consumer = async (msg, channel, repository) => {
   const { id, country, countriesCount } = JSON.parse(

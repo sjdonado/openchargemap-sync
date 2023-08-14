@@ -1,6 +1,6 @@
-import { fetchReferenceData } from '../services/openChargeMap';
+import { type Controller } from '../@types/router';
 
-import { type Controller } from '../router';
+import { fetchReferenceData } from '../services/openChargeMap';
 import { openChargeMapPublisher } from '../publishers/openChargeMapPublisher';
 
 export const runController: Controller = async (req, res, repository) => {
