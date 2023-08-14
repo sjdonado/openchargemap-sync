@@ -7,6 +7,7 @@ const mockCollection = {
   find: jest.fn(
     () =>
       ({
+        limit: jest.fn(),
         toArray: jest.fn(),
       }) as unknown as jest.Mocked<FindCursor>,
   ),
