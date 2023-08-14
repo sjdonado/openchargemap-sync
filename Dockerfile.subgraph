@@ -2,12 +2,12 @@ FROM node:20
 
 WORKDIR /usr/src/app
 
-COPY ./scraper/package.json .
-COPY ./scraper/yarn.lock .
+COPY ./graphql-subgraph/package.json .
+COPY ./graphql-subgraph/yarn.lock .
 
 RUN yarn install --prefer-offline --frozen-lockfile
 
-COPY ./scraper .
+COPY ./graphql-subgraph .
 
 RUN yarn build
 
