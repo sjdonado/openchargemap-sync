@@ -4,8 +4,8 @@
   "description": "GraphQL Subgraph server",
   "scripts": {
     "build": "tsc --p tsconfig.prod.json",
-    "start": "node ./dist/server.js",
-    "dev": "tsc-watch --onSuccess \"node ./build/src/server.js\"",
+    "start": "node ./dist/bin/index.js",
+    "dev": "tsc-watch --onSuccess \"node ./build/src/bin/index.js\"",
     "test": "jest --detectOpenHandles",
     "lint": "eslint . --ext .ts"
   },

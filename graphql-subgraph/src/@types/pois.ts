@@ -1,16 +1,8 @@
-import type * as MUUID from 'uuid-mongodb';
-
-import { type DatabaseCollections } from '../repository/database';
-
-export type POIListSnapshot = {
-  _id: MUUID.MUUID;
-  poiListIds: MUUID.MUUID[];
-  countriesProcessed: number;
-  isCompleted: boolean;
-};
-
-export type Repository = {
-  collections: DatabaseCollections;
+export type POI = {
+  OperatorInfo: OperatorInfo;
+  StatusType: StatusType;
+  AddressInfo: AddressInfo;
+  Connections: Connection[];
 };
 
 export type Country = {
@@ -103,11 +95,4 @@ type Connection = {
 
 export type CoreReferenceData = {
   Countries: Country[];
-};
-
-export type POI = {
-  OperatorInfo: OperatorInfo;
-  StatusType: StatusType;
-  AddressInfo: AddressInfo;
-  Connections: Connection[];
 };

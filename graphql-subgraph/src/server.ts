@@ -9,20 +9,23 @@ import { KeyvAdapter } from '@apollo/utils.keyvadapter';
 import { loadFilesSync } from '@graphql-tools/load-files';
 
 import env from './config/env';
-import { type Repository } from './@types';
+import { type Repository } from './@types/server';
 
 import { connectDatabase } from './repository/database';
 
 import resolvers from './resolvers';
 
-const typeDefs = loadFilesSync<DocumentNode>('./src/schemas/*.graphql');
+export const directives = loadFilesSync('./src/directives/*.graphql');
+export const schemas = loadFilesSync<DocumentNode>('./src/schemas/*.graphql');
 
-const server = new ApolloServer({
-  schema: buildSubgraphSchema({ typeDefs, resolvers }),
-  cache: new KeyvAdapter(new Keyv(env.REDIS_URI)),
-});
+export const start = async () => {
+  const typeDefs = schemas.concat(directives);
 
-(async () => {
+  const server = new ApolloServer({
+    schema: buildSubgraphSchema({ typeDefs, resolvers }),
+    cache: new KeyvAdapter(new Keyv(env.REDIS_URI)),
+  });
+
   const [collections, disconnectDatabase] = await connectDatabase();
 
   const repository: Repository = { collections };
@@ -42,4 +45,4 @@ const server = new ApolloServer({
     console.log('[server] Server stopped');
     process.exit(0);
   });
-})();
+};

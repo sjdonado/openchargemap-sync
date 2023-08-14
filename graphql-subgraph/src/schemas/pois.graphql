@@ -1,0 +1,102 @@
+type Query {
+  pois: [POI!]!
+}
+
+type POI {
+  OperatorInfo: OperatorInfo!
+  StatusType: StatusType!
+  AddressInfo: AddressInfo
+  Connections: [Connection!]!
+}
+
+type Country {
+  ID: Float!
+  ISOCode: String!
+  ContinentCode: String!
+  Title: String!
+}
+
+type AddressInfo {
+  ID: Float!
+  Description: String!
+  AddressLine1: String!
+  AddressLine2: String
+  Town: String!
+  StateOrProvince: String!
+  Postcode: String!
+  CountryID: Float!
+  Country: Country!
+  Latitude: Float!
+  Longitude: Float!
+  ContactTelephone1: String
+  ContactTelephone2: String
+  ContactEmail: String
+  AccessComments: String
+  RelatedURL: String
+  Distance: Float
+  DistanceUnit: Int!
+}
+
+type OperatorInfo {
+  ID: Float!
+  description: String!
+  WebsiteURL: String!
+  Comments: String
+  PhonePrimaryContact: String
+  PhoneSecondaryContact: String
+  IsPrivateIndividual: Boolean!
+  AddressInfo: AddressInfo
+  BookingURL: String
+  ContactEmail: String
+  FaultReportEmail: String
+  IsRestrictedEdit: Boolean!
+}
+
+type StatusType {
+  ID: Float!
+  description: String!
+  IsOperational: Boolean!
+  IsUserSelectable: Boolean!
+}
+
+type ConnectionType {
+  ID: Float!
+  title: String!
+  FormalName: String!
+  IsDiscontinued: Boolean!
+  IsObsolete: Boolean!
+}
+
+type Level {
+  ID: Float!
+  Title: String!
+  Comments: String!
+  IsFastChargeCapable: Boolean!
+}
+
+type CurrentType {
+  ID: Float!
+  Title: String
+}
+
+type Connection {
+  ID: Float!
+  ConnectionTypeID: Float!
+  ConnectionType: ConnectionType!
+  Reference: String
+  StatusTypeID: Int!
+  StatusType: StatusType!
+  LevelID: Float!
+  Level: Level!
+  Amps: Float
+  Voltage: Float
+  PowerKW: Float!
+  CurrentTypeID: Float!
+  CurrentType: CurrentType!
+  Quantity: Int!
+  Comments: String
+}
+
+type CoreReferenceData {
+  Countries: [Country!]!
+}
