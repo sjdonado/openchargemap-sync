@@ -46,6 +46,38 @@ Ran all test suites.
 ✨  Done in 10.85s.
 ```
 
+- graphql-subgraph
+```bash
+--------------------|---------|----------|---------|---------|-------------------
+File                | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s
+--------------------|---------|----------|---------|---------|-------------------
+All files           |   96.65 |     92.3 |   88.88 |   96.65 |
+ __tests__/fixtures |     100 |      100 |     100 |     100 |
+  pois.ts           |     100 |      100 |     100 |     100 |
+ __tests__/mocks    |   88.46 |      100 |     100 |   88.46 |
+  repository.ts     |   88.46 |      100 |     100 |   88.46 | 9-11
+ src                |   88.46 |      100 |     100 |   88.46 |
+  server.ts         |   88.46 |      100 |     100 |   88.46 | 41-46
+ src/config         |     100 |        0 |     100 |     100 |
+  constants.ts      |     100 |      100 |     100 |     100 |
+  env.ts            |     100 |        0 |     100 |     100 | 6
+ src/repository     |     100 |      100 |      50 |     100 |
+  database.ts       |     100 |      100 |      50 |     100 |
+ src/resolvers      |     100 |      100 |     100 |     100 |
+  index.ts          |     100 |      100 |     100 |     100 |
+  pois.ts           |     100 |      100 |     100 |     100 |
+ src/serializers    |     100 |      100 |     100 |     100 |
+  poi.ts            |     100 |      100 |     100 |     100 |
+--------------------|---------|----------|---------|---------|-------------------
+
+Test Suites: 2 passed, 2 total
+Tests:       4 passed, 4 total
+Snapshots:   0 total
+Time:        3.008 s
+Ran all test suites.
+✨  Done in 3.53s.
+```
+
 ## Linter reports
 
 - scraper-service
@@ -60,6 +92,13 @@ $ eslint . --ext .ts
 ✖ 1 problem (0 errors, 1 warning)
 
 ✨  Done in 1.81s.
+```
+
+- graphql-subgraph
+```bash
+yarn run v1.22.19
+$ eslint . --ext .ts
+✨  Done in 1.71s.
 ```
 
 ## How to run
