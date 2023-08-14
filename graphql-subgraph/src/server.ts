@@ -45,4 +45,8 @@ export const start = async () => {
     console.log('[server] Server stopped');
     process.exit(0);
   });
+
+  const disconnect = async () => server.stop();
+
+  return [repository, disconnect] as [Repository, () => Promise<void>];
 };

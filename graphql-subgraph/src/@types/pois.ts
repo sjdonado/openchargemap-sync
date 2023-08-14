@@ -75,7 +75,7 @@ type CurrentType = {
   Title?: string;
 };
 
-type Connection = {
+export type Connection = {
   ID: number;
   ConnectionTypeID: number;
   ConnectionType: ConnectionType;

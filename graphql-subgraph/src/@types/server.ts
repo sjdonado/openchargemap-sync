@@ -15,3 +15,9 @@ export type GraphQLSingleResult<T> = {
     singleResult: FormattedExecutionResult<T>;
   };
 };
+
+export type EnvVariables = {
+  PORT: number;
+  MONGO_URI: string;
+  REDIS_URI: string;
+};

@@ -1,10 +1,6 @@
 import 'dotenv/config';
 
-export type EnvVariables = {
-  PORT: number;
-  MONGO_URI: string;
-  REDIS_URI: string;
-};
+import { type EnvVariables } from '../@types/server';
 
 const env: EnvVariables = {
   PORT: Number(process.env.PORT ?? '4000'),
