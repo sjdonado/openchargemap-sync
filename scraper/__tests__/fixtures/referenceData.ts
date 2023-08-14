@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
 
-import { type CoreReferenceData } from '../../src/services/openChargeMap';
+import { type CoreReferenceData } from '../../src/@types/poi';
 
 export const referenceData: CoreReferenceData = {
   Countries: [

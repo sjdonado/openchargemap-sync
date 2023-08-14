@@ -1,5 +1,18 @@
 # openchargemap-sync
 
+**Run in dev**
+
+1. Create `.env` file following `.env.example`
+2. Run docker-compose + scripts
+```bash
+./setup.sh
+```
+3. Run services
+```bash
+yarn --cwd scraper dev
+yarn --cwd graphql-subgraph dev
+```
+
 ## Test Coverage
 
 - scraper-service
@@ -8,42 +21,42 @@
 ----------------------------|---------|----------|---------|---------|-------------------
 File                        | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s
 ----------------------------|---------|----------|---------|---------|-------------------
-All files                   |   98.74 |    89.28 |      95 |   98.74 |
+All files                   |   98.57 |    90.38 |   94.73 |   98.57 |
  __tests__/fixtures         |     100 |      100 |     100 |     100 |
   poiList.ts                |     100 |      100 |     100 |     100 |
   referenceData.ts          |     100 |      100 |     100 |     100 |
- __tests__/helpers          |   97.72 |     87.5 |     100 |   97.72 |
-  http.ts                   |    97.5 |    83.33 |     100 |    97.5 | 36
+ __tests__/helpers          |     100 |      100 |     100 |     100 |
   time.ts                   |     100 |      100 |     100 |     100 |
  __tests__/mocks            |     100 |      100 |     100 |     100 |
   http.ts                   |     100 |      100 |     100 |     100 |
   repository.ts             |     100 |      100 |     100 |     100 |
- src                        |   93.81 |    81.81 |     100 |   93.81 |
+ src                        |   91.54 |       80 |     100 |   91.54 |
+  server.ts                 |   91.54 |       80 |     100 |   91.54 | 42-46,55
+ src/@types                 |     100 |      100 |     100 |     100 |
   router.ts                 |     100 |      100 |     100 |     100 |
-  server.ts                 |   91.42 |       80 |     100 |   91.42 | 41-45,54
  src/config                 |     100 |        0 |     100 |     100 |
   constant.ts               |     100 |      100 |     100 |     100 |
-  env.ts                    |     100 |        0 |     100 |     100 | 18-19
- src/consumers              |     100 |    92.85 |     100 |     100 |
-  openChargeMapConsumer.ts  |     100 |    92.85 |     100 |     100 | 34
+  env.ts                    |     100 |        0 |     100 |     100 | 6-7
+ src/consumers              |     100 |    93.75 |     100 |     100 |
+  openChargeMapConsumer.ts  |     100 |    93.75 |     100 |     100 | 25
  src/controllers            |     100 |      100 |     100 |     100 |
   health.ts                 |     100 |      100 |     100 |     100 |
   run.ts                    |     100 |      100 |     100 |     100 |
  src/publishers             |     100 |      100 |     100 |     100 |
   openChargeMapPublisher.ts |     100 |      100 |     100 |     100 |
- src/repository             |   98.16 |      100 |    87.5 |   98.16 |
+ src/repository             |   97.95 |      100 |    87.5 |   97.95 |
   database.ts               |     100 |      100 |     100 |     100 |
-  messageQueue.ts           |   97.43 |      100 |      80 |   97.43 | 73-74
+  messageQueue.ts           |   97.14 |      100 |      80 |   97.14 | 65-66
  src/services               |     100 |      100 |     100 |     100 |
   openChargeMap.ts          |     100 |      100 |     100 |     100 |
 ----------------------------|---------|----------|---------|---------|-------------------
 
 Test Suites: 5 passed, 5 total
-Tests:       8 passed, 8 total
+Tests:       9 passed, 9 total
 Snapshots:   0 total
-Time:        10.142 s
+Time:        10.023 s
 Ran all test suites.
-✨  Done in 10.85s.
+✨  Done in 10.90s.
 ```
 
 - graphql-subgraph
@@ -99,18 +112,4 @@ $ eslint . --ext .ts
 yarn run v1.22.19
 $ eslint . --ext .ts
 ✨  Done in 1.71s.
-```
-
-## How to run
-
-1. Create `.env` file following `.env.example`
-
-2. Run docker-compose + scripts
-```bash
-./setup.sh
-```
-
-3. Run services
-```bash
-yarn --cwd scraper dev
 ```

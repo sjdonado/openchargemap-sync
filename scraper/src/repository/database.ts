@@ -1,11 +1,8 @@
-import { MongoClient, type Collection, type ClientSession } from 'mongodb';
+import { MongoClient, type ClientSession } from 'mongodb';
+
+import { type DatabaseCollections } from '../@types/server';
 
 import env from '../config/env';
-
-export type DatabaseCollections = {
-  poiListSnapshots: Collection;
-  pois: Collection;
-};
 
 export type DatabaseConnection = Promise<
   [DatabaseCollections, () => Promise<ClientSession>, () => Promise<void>]
