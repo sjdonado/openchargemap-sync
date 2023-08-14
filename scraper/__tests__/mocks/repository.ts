@@ -1,13 +1,13 @@
 import { type ClientSession, type Collection } from 'mongodb';
 
-import { type Repository } from '../../src/router';
+import { type Repository } from '../../src/@types/server';
 
 const mockCollection = {
   countDocuments: jest.fn(),
   findOne: jest.fn(),
   insertOne: jest.fn(),
   updateOne: jest.fn(),
-  deleteOne: jest.fn(),
+  findOneAndDelete: jest.fn(),
   insertMany: jest.fn(),
 } as unknown as jest.Mocked<Collection>;
 

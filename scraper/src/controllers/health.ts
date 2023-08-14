@@ -1,4 +1,4 @@
-import { type Controller } from '../router';
+import { type Controller } from '../@types/router';
 
 export const healthController: Controller = async (req, res, repository) => {
   const snapshotsCount = await repository.collections.poiListSnapshots.countDocuments();

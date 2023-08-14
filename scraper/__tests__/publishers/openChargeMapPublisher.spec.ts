@@ -1,12 +1,10 @@
 import * as MUUID from 'uuid-mongodb';
 import { faker } from '@faker-js/faker';
 
-import { type Country } from '../../src/services/openChargeMap';
+import { type Country } from '../../src/@types/poi';
+import { type ScraperMessage } from '../../src/@types/scraper';
 
-import {
-  type ScraperMessage,
-  openChargeMapPublisher,
-} from '../../src/publishers/openChargeMapPublisher';
+import { openChargeMapPublisher } from '../../src/publishers/openChargeMapPublisher';
 
 import { mockRepository } from '../mocks/repository';
 

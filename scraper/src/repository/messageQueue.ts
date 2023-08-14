@@ -2,14 +2,6 @@ import amqp from 'amqplib';
 
 import env from '../config/env';
 
-import { type Repository } from '../router';
-
-export type Consumer = (
-  msg: amqp.ConsumeMessage,
-  channel: amqp.Channel,
-  repository: Repository,
-) => Promise<void>;
-
 export type ConsumerHandler = (
   msg: amqp.ConsumeMessage,
   channel: amqp.Channel,

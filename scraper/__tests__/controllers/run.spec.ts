@@ -25,7 +25,7 @@ describe('runController', () => {
 
     await runController(mockReq, mockRes, mockRepository);
 
-    expect(fetchReferenceData).toHaveBeenCalled();
+    expect(fetchReferenceData).toHaveBeenCalledTimes(1);
     expect(openChargeMapPublisher).toHaveBeenCalledWith(countries, mockRepository);
 
     expect(mockRes.writeHead).toHaveBeenCalledWith(200, {
