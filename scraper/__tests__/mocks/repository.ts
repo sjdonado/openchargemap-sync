@@ -7,7 +7,7 @@ const mockCollection = {
   findOne: jest.fn(),
   insertOne: jest.fn(),
   updateOne: jest.fn(),
-  deleteOne: jest.fn(),
+  findOneAndDelete: jest.fn(),
   insertMany: jest.fn(),
 } as unknown as jest.Mocked<Collection>;
 

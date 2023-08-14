@@ -1,5 +1,6 @@
 import axios from 'axios';
 import request from 'supertest';
+import * as MUUID from 'uuid-mongodb';
 import MockAdapter from 'axios-mock-adapter';
 
 import { type Repository, type EnvVariables } from '../../src/@types/server';
@@ -38,6 +39,17 @@ describe('GET /run ', () => {
   beforeAll(async () => {
     // prettier-ignore
     ([repository, disconnect] = await start());
+
+    // Cleanup
+    await repository.collections.poiListSnapshots.deleteMany({});
+    await repository.collections.pois.deleteMany({});
+    await repository.collections.poiListSnapshots.insertOne({
+      // @ts-expect-error _id is a valid field
+      _id: MUUID.v4(),
+      countriesProcessed: 0,
+      isCompleted: true,
+      poiListIds: [],
+    });
   });
 
   beforeEach(() => {
@@ -56,6 +68,7 @@ describe('GET /run ', () => {
     const endpoint = '/run';
 
     const POIList = generatePOIList(1000);
+    const POIListInsertedCount = POIList.length * (referenceData.Countries.length - 1);
 
     const snapshots = await repository.collections.poiListSnapshots.find().toArray();
     const pois = await repository.collections.pois.find().toArray();
@@ -92,14 +105,18 @@ describe('GET /run ', () => {
     expect(response.headers['content-type']).toContain('application/json');
     expect(response.body.message).toContain('Job started');
 
-    expect(snapshotsAfter.length).toBeGreaterThan(snapshots.length);
+    expect(snapshotsAfter.length).toEqual(snapshots.length);
     expect(snapshotsAfter[snapshotsAfter.length - 1].poiListIds.length).toBe(
-      POIList.length * (referenceData.Countries.length - 1),
+      POIListInsertedCount,
     );
 
     expect(poisAfter.length).toBeGreaterThan(pois.length);
-    expect(poisAfter.length - pois.length).toBe(
-      POIList.length * (referenceData.Countries.length - 1),
+    expect(poisAfter.length - pois.length).toBe(POIListInsertedCount);
+
+    //
+    // check the latest available snapshot has the inserted POIs
+    expect(snapshotsAfter[snapshotsAfter.length - 1].poiListIds).toEqual(
+      poisAfter.slice(-POIListInsertedCount).map((poi) => poi._id),
     );
   });
 });

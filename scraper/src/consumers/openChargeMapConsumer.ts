@@ -53,12 +53,13 @@ export const openChargeMapConsumer: Consumer = async (msg, channel, repository) 
         });
 
       const countriesProcessed = (currentSnapshot?.countriesProcessed ?? 0) + 1;
+      const isCompleted = countriesCount === countriesProcessed;
 
       const update = {
         $set: {
           _id: filter._id,
           poiListIds: [...(currentSnapshot?.poiListIds ?? []), ...poiListChunkIds],
-          isCompleted: countriesCount === countriesProcessed,
+          isCompleted,
         },
         $inc: {
           countriesProcessed: 1,
@@ -69,6 +70,14 @@ export const openChargeMapConsumer: Consumer = async (msg, channel, repository) 
         upsert: true,
         session,
       });
+
+      if (isCompleted) {
+        await repository.collections.poiListSnapshots.findOneAndDelete({
+          isCompleted: true,
+          // @ts-expect-error _id is a valid field
+          _id: { $ne: filter._id },
+        });
+      }
 
       console.log(
         `[openChargeMapConsumer]: ${poiListChunkIds.length} POIs stored in database`,
