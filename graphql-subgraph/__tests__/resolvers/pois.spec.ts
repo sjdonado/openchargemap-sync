@@ -10,7 +10,6 @@ import poisResolver from '../../src/resolvers/pois';
 
 import { mockRepository } from '../mocks/repository';
 import { generatePOIList } from '../fixtures/pois';
-import { GraphQLResponseBody } from '@apollo/server/dist/esm/externalTypes/graphql';
 
 describe('pois resolver', () => {
   let server: ApolloServer<CustomContext>;

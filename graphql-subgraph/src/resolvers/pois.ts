@@ -7,8 +7,8 @@ import { serializePOIList } from '../serializers/poi';
 export default {
   Query: {
     async pois(
-      _parent: any,
-      _args: any,
+      _parent: unknown,
+      _args: unknown,
       { repository }: { repository: Repository },
     ): Promise<POI[]> {
       const latestSnapshot =
