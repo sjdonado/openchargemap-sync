@@ -1,4 +1,5 @@
 import axios from 'axios';
+import request from 'supertest';
 import MockAdapter from 'axios-mock-adapter';
 
 import { type Repository } from '../../src/router';
@@ -10,11 +11,11 @@ import { POI_LIST_MAX_RESULTS } from '../../src/config/constant';
 import { referenceData } from '../fixtures/referenceData';
 import { generatePOIList } from '../fixtures/poiList';
 
-import { fetch } from '../helpers/http';
 import { waitFor } from '../helpers/time';
 
 const TEST_DELAY = 3000;
 const TEST_PORT = 1234;
+const TEST_BASE_URL = `http://localhost:${TEST_PORT}`;
 
 jest.mock('../../src/config/env', () => {
   const actual: jest.Mocked<{ default: EnvVariables }> =
@@ -54,7 +55,7 @@ describe('GET /run ', () => {
   it('should return 200 when sending a GET request', async () => {
     const endpoint = '/run';
 
-    const POIList = generatePOIList(100);
+    const POIList = generatePOIList(1000);
 
     const snapshots = await repository.collections.poiListSnapshots.find().toArray();
     const pois = await repository.collections.pois.find().toArray();
@@ -78,12 +79,7 @@ describe('GET /run ', () => {
       })
       .reply(200, POIList);
 
-    const response = await fetch({
-      method: 'GET',
-      hostname: 'localhost',
-      port: TEST_PORT,
-      path: endpoint,
-    });
+    const response = await request(TEST_BASE_URL).get(endpoint);
 
     await waitFor(TEST_DELAY);
 
@@ -91,9 +87,10 @@ describe('GET /run ', () => {
 
     const poisAfter = await repository.collections.pois.find().toArray();
 
+    expect(response).toBeDefined();
     expect(response.status).toBe(200);
     expect(response.headers['content-type']).toContain('application/json');
-    expect(response.data.message).toContain('Job started');
+    expect(response.body.message).toContain('Job started');
 
     expect(snapshotsAfter.length).toBeGreaterThan(snapshots.length);
     expect(snapshotsAfter[snapshotsAfter.length - 1].poiListIds.length).toBe(

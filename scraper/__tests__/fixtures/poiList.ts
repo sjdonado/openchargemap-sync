@@ -72,6 +72,9 @@ const generatePOI: () => POI = () => ({
       LevelID: faker.number.int(),
       Level: {
         ID: faker.number.int(),
+        Title: faker.lorem.lines(1),
+        Comments: faker.lorem.lines(1),
+        IsFastChargeCapable: faker.datatype.boolean(),
       },
       Amps: faker.number.float(),
       Voltage: faker.number.float(),
@@ -79,6 +82,7 @@ const generatePOI: () => POI = () => ({
       CurrentTypeID: faker.number.int(),
       CurrentType: {
         ID: faker.number.int(),
+        Title: faker.lorem.lines(1),
       },
       Quantity: faker.number.float(),
       Comments: faker.lorem.lines(1),
