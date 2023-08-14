@@ -1,19 +1,48 @@
 # openchargemap-sync
 
-**Run in dev**
+## Setup and run
 
-1. Create `.env` file following `.env.example`
-2. Run docker-compose + scripts
+1. Create `.env` (copy and paste from `./.env.example`)
+2. Run docker-compose + scripts (sudo required)
 ```bash
 ./setup.sh
 ```
-3. Run services
+3. Pull data
 ```bash
-yarn --cwd scraper dev
-yarn --cwd graphql-subgraph dev
+curl -X GET http://localhost:3000/run
+```
+4. Output example
+```bash
+MongoDB configuration completed.
+scraper_service   | yarn run v1.22.19
+scraper_service   | $ node ./dist/bin/index.js
+scraper_service   | [database]: Connected to mongodb://root_user:root_pass@mongo1:27017,mongo2:27018/scraperDatabase?replicaSet=rs0
+scraper_service   | [messageQueue]: Consumer connected to scraper-main-queue
+scraper_service   | [server] listening on PORT 3000
+subgraph_service  | yarn run v1.22.19
+subgraph_service  | $ node ./dist/bin/index.js
+subgraph_service  | [database]: Connected to mongodb://root_user:root_pass@mongo1:27017,mongo2:27018/scraperDatabase?replicaSet=rs0
+subgraph_service  | Enabling inline tracing for this subgraph. To disable, use ApolloServerPluginInlineTraceDisabled.
+subgraph_service  | [server] Server is running, GraphQL Playground available at http://localhost:4000/
+scraper_service   | [openChargeMapPublisher]: ca9bb35a-9f71-400b-b9e0-a2ed0c70ed13 CO - 2
+scraper_service   | [openChargeMapPublisher]: ca9bb35a-9f71-400b-b9e0-a2ed0c70ed13 DE - 2
+scraper_service   | [openChargeMapConsumer]: 21 POIs stored in database
+scraper_service   | [openChargeMapConsumer]: CO - poiListIds 21
+scraper_service   | [openChargeMapConsumer]: 5000 POIs stored in database
+scraper_service   | [openChargeMapConsumer]: DE - poiListIds 5021
+subgraph_service  | [poisResolver] snapshot: ca9bb35a-9f71-400b-b9e0-a2ed0c70ed13 poiListIds: 5021 edges: 100
+subgraph_service  | [poisResolver] snapshot: ca9bb35a-9f71-400b-b9e0-a2ed0c70ed13 poiListIds: 5021 edges: 10
 ```
 
-## Test Coverage
+## Tests
+
+To run tests
+```bash
+yarn --cwd scraper test
+yarn --cwd graphql-subgraph test
+```
+
+### Results
 
 - scraper-service
 
@@ -21,7 +50,7 @@ yarn --cwd graphql-subgraph dev
 ----------------------------|---------|----------|---------|---------|-------------------
 File                        | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s
 ----------------------------|---------|----------|---------|---------|-------------------
-All files                   |   98.57 |    90.38 |   94.73 |   98.57 |
+All files                   |   98.58 |       90 |   94.73 |   98.58 |
  __tests__/fixtures         |     100 |      100 |     100 |     100 |
   poiList.ts                |     100 |      100 |     100 |     100 |
   referenceData.ts          |     100 |      100 |     100 |     100 |
@@ -37,8 +66,8 @@ All files                   |   98.57 |    90.38 |   94.73 |   98.57 |
  src/config                 |     100 |        0 |     100 |     100 |
   constant.ts               |     100 |      100 |     100 |     100 |
   env.ts                    |     100 |        0 |     100 |     100 | 6-7
- src/consumers              |     100 |    93.75 |     100 |     100 |
-  openChargeMapConsumer.ts  |     100 |    93.75 |     100 |     100 | 25
+ src/consumers              |     100 |    92.85 |     100 |     100 |
+  openChargeMapConsumer.ts  |     100 |    92.85 |     100 |     100 | 25
  src/controllers            |     100 |      100 |     100 |     100 |
   health.ts                 |     100 |      100 |     100 |     100 |
   run.ts                    |     100 |      100 |     100 |     100 |
@@ -54,9 +83,9 @@ All files                   |   98.57 |    90.38 |   94.73 |   98.57 |
 Test Suites: 5 passed, 5 total
 Tests:       9 passed, 9 total
 Snapshots:   0 total
-Time:        10.023 s
+Time:        9.426 s
 Ran all test suites.
-✨  Done in 10.90s.
+✨  Done in 10.05s.
 ```
 
 - graphql-subgraph
@@ -64,7 +93,7 @@ Ran all test suites.
 --------------------|---------|----------|---------|---------|-------------------
 File                | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s
 --------------------|---------|----------|---------|---------|-------------------
-All files           |   98.81 |    89.65 |    90.9 |   98.81 |
+All files           |   98.82 |    89.65 |    90.9 |   98.82 |
  __tests__/fixtures |     100 |      100 |     100 |     100 |
   pois.ts           |     100 |      100 |     100 |     100 |
   queries.ts        |     100 |      100 |     100 |     100 |
@@ -89,9 +118,9 @@ All files           |   98.81 |    89.65 |    90.9 |   98.81 |
 Test Suites: 2 passed, 2 total
 Tests:       9 passed, 9 total
 Snapshots:   0 total
-Time:        4.099 s
+Time:        3.516 s, estimated 4 s
 Ran all test suites.
-✨  Done in 4.64s.
+✨  Done in 3.92s.
 ```
 
 ## Linter reports
@@ -99,20 +128,28 @@ Ran all test suites.
 - scraper-service
 
 ```bash
-yarn run v1.22.19
 $ eslint . --ext .ts
 
 /Users/sjdonado/projects/openchargemap-sync/scraper/__tests__/consumers/openChargeMapConsumer.spec.ts
-  86:5  warning  Unexpected 'todo' comment: 'TODO: configure retry/recovery logic'  no-warning-comments
+  294:5  warning  Unexpected 'todo' comment: 'TODO: configure retry/recovery logic'  no-warning-comments
 
-✖ 1 problem (0 errors, 1 warning)
+/Users/sjdonado/projects/openchargemap-sync/scraper/src/consumers/openChargeMapConsumer.ts
+  74:7  warning  Unexpected 'todo' comment: 'TODO: database cleanup: remove old...'  no-warning-comments
 
-✨  Done in 1.81s.
+✖ 2 problems (0 errors, 2 warnings)
+
+✨  Done in 1.77s.
 ```
 
 - graphql-subgraph
 ```bash
-yarn run v1.22.19
 $ eslint . --ext .ts
-✨  Done in 1.71s.
+
+/Users/sjdonado/projects/openchargemap-sync/graphql-subgraph/__tests__/resolvers/pois.spec.ts
+  182:26  warning  Too many nested callbacks (5). Maximum allowed is 4  max-nested-callbacks
+  183:22  warning  Too many nested callbacks (5). Maximum allowed is 4  max-nested-callbacks
+
+✖ 2 problems (0 errors, 2 warnings)
+
+✨  Done in 1.69s.
 ```
