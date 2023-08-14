@@ -24,6 +24,7 @@ export const start = async () => {
   const server = new ApolloServer({
     schema: buildSubgraphSchema({ typeDefs, resolvers }),
     cache: new KeyvAdapter(new Keyv(env.REDIS_URI)),
+    csrfPrevention: false,
   });
 
   const [collections, disconnectDatabase] = await connectDatabase();
