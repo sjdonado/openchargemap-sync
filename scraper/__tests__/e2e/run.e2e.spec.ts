@@ -105,7 +105,7 @@ describe('GET /run ', () => {
     expect(response.headers['content-type']).toContain('application/json');
     expect(response.body.message).toContain('Job started');
 
-    expect(snapshotsAfter.length).toEqual(snapshots.length);
+    expect(snapshotsAfter.length).toBeGreaterThan(snapshots.length);
     expect(snapshotsAfter[snapshotsAfter.length - 1].poiListIds.length).toBe(
       POIListInsertedCount,
     );
