@@ -1,6 +1,8 @@
+import * as MUUID from 'uuid-mongodb';
+
 import { faker } from '@faker-js/faker';
 
-import { type POI } from '../../src/@types/pois';
+import { type POIDatabase } from '../../src/@types/pois';
 
 const AddressInfo = {
   ID: faker.number.int(),
@@ -28,7 +30,8 @@ const AddressInfo = {
   DistanceUnit: faker.number.float(),
 };
 
-const generatePOI: () => POI = () => ({
+const generateDatabasePOI: () => POIDatabase = () => ({
+  _id: MUUID.from(faker.string.uuid()),
   OperatorInfo: {
     ID: faker.number.int(),
     description: faker.lorem.lines(1),
@@ -90,7 +93,7 @@ const generatePOI: () => POI = () => ({
   ],
 });
 
-export const generatePOIList = (items = 1) =>
+export const generateDatabasePOIList = (items = 1) =>
   Array(items)
     .fill({})
-    .map(() => generatePOI());
+    .map(() => generateDatabasePOI());

@@ -34,19 +34,30 @@ describe('POST /', () => {
 
   it('should return a list of POIs', async () => {
     const query = `#graphql
-      query pois {
+      query GetPois {
         pois {
-          StatusType {
-            ID
+          edges {
+            cursor
+            node {
+              StatusType {
+                ID
+              }
+              AddressInfo {
+                ID
+              }
+              Connections {
+                ID
+              }
+              OperatorInfo {
+                ID
+              }
+            }
           }
-          AddressInfo {
-            ID
-          }
-          Connections {
-            ID
-          }
-          OperatorInfo {
-            ID
+          pageInfo {
+            hasNextPage
+            hasPreviousPage
+            startCursor
+            endCursor
           }
         }
       }
@@ -57,8 +68,8 @@ describe('POST /', () => {
     expect(response.status).toBe(200);
     expect(response.body.data).toBeDefined();
 
-    expect(response.body.data.pois.length).toBeGreaterThan(0);
-    expect(response.body.data.pois[0]).toMatchObject({
+    expect(response.body.data.pois.edges.length).toBeGreaterThan(0);
+    expect(response.body.data.pois.edges[0].node).toMatchObject({
       StatusType: {
         ID: expect.any(Number) as jest.Mocked<number>,
       },

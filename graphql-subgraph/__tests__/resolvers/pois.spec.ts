@@ -4,14 +4,15 @@ import * as MUUID from 'uuid-mongodb';
 import { type POI } from '../../src/@types/pois';
 import { type GraphQLSingleResult, type CustomContext } from '../../src/@types/server';
 import { type POIListSnapshot } from '../@types/poiListSnapshot';
+import { type PaginatedResult, type PageInfoArgs } from '../@types/pagination';
 
 import { schemas } from '../../src/server';
 import poisResolver from '../../src/resolvers/pois';
 
 import { mockRepository } from '../mocks/repository';
-import { generatePOIList } from '../fixtures/pois';
+import { generateDatabasePOIList } from '../fixtures/pois';
 
-describe('pois resolver', () => {
+describe('Pois resolver', () => {
   let server: ApolloServer<CustomContext>;
 
   const poiListSnapshot: POIListSnapshot = {
@@ -21,118 +22,6 @@ describe('pois resolver', () => {
     isCompleted: true,
   };
 
-  const query = `#graphql
-  query GetPois {
-    pois {
-      OperatorInfo {
-        ID
-        description
-        WebsiteURL
-        Comments
-        PhonePrimaryContact
-        PhoneSecondaryContact
-        IsPrivateIndividual
-        BookingURL
-        ContactEmail
-        FaultReportEmail
-        IsRestrictedEdit
-        AddressInfo {
-          ID
-          Description
-          AddressLine1
-          AddressLine2
-          Town
-          StateOrProvince
-          Postcode
-          CountryID
-          Country {
-            ID
-            ISOCode
-            ContinentCode
-            Title
-          }
-          Latitude
-          Longitude
-          ContactTelephone1
-          ContactTelephone2
-          ContactEmail
-          AccessComments
-          RelatedURL
-          Distance
-          DistanceUnit
-        }
-      }
-      StatusType {
-        ID
-        description
-        IsOperational
-        IsUserSelectable
-      }
-      AddressInfo {
-        ID
-        Description
-        AddressLine1
-        AddressLine2
-        Town
-        StateOrProvince
-        Postcode
-        CountryID
-        Country {
-          ID
-          ISOCode
-          ContinentCode
-          Title
-        }
-        Latitude
-        Longitude
-        ContactTelephone1
-        ContactTelephone2
-        ContactEmail
-        AccessComments
-        RelatedURL
-        Distance
-        DistanceUnit
-      }
-      Connections {
-        ID
-        ConnectionTypeID
-        ConnectionType {
-          ID
-          title
-          FormalName
-          IsDiscontinued
-          IsObsolete
-        }
-        Reference
-        StatusTypeID
-        LevelID
-        Level {
-          ID
-          Title
-          Comments
-          IsFastChargeCapable
-        }
-        Amps
-        Voltage
-        PowerKW
-        CurrentTypeID
-        CurrentType {
-          ID
-          Title
-        }
-        Quantity
-        Comments
-        StatusType {
-          ID
-          description
-          IsOperational
-          IsUserSelectable
-        }
-      }
-    }
-  }
-  `;
-
   beforeAll(async () => {
     const context: CustomContext = { repository: mockRepository };
 
@@ -140,8 +29,8 @@ describe('pois resolver', () => {
       typeDefs: schemas,
       resolvers: {
         Query: {
-          pois: async (_parent, _args) =>
-            poisResolver.Query.pois(_parent, _args, context),
+          pois: async (parent, args: PageInfoArgs) =>
+            poisResolver.Query.pois(parent, args, context),
         },
       },
     });
@@ -151,89 +40,236 @@ describe('pois resolver', () => {
     await server.stop();
   });
 
-  it('should return a list of POIs', async () => {
-    const pois = generatePOIList();
+  describe('Query.pois - No pagination', () => {
+    const query = `#graphql
+      query GetPois {
+        pois {
+          edges {
+            cursor
+            node {
+              OperatorInfo {
+                ID
+                description
+                WebsiteURL
+                Comments
+                PhonePrimaryContact
+                PhoneSecondaryContact
+                IsPrivateIndividual
+                BookingURL
+                ContactEmail
+                FaultReportEmail
+                IsRestrictedEdit
+                AddressInfo {
+                  ID
+                  Description
+                  AddressLine1
+                  AddressLine2
+                  Town
+                  StateOrProvince
+                  Postcode
+                  CountryID
+                  Country {
+                    ID
+                    ISOCode
+                    ContinentCode
+                    Title
+                  }
+                  Latitude
+                  Longitude
+                  ContactTelephone1
+                  ContactTelephone2
+                  ContactEmail
+                  AccessComments
+                  RelatedURL
+                  Distance
+                  DistanceUnit
+                }
+              }
+              StatusType {
+                ID
+                description
+                IsOperational
+                IsUserSelectable
+              }
+              AddressInfo {
+                ID
+                Description
+                AddressLine1
+                AddressLine2
+                Town
+                StateOrProvince
+                Postcode
+                CountryID
+                Country {
+                  ID
+                  ISOCode
+                  ContinentCode
+                  Title
+                }
+                Latitude
+                Longitude
+                ContactTelephone1
+                ContactTelephone2
+                ContactEmail
+                AccessComments
+                RelatedURL
+                Distance
+                DistanceUnit
+              }
+              Connections {
+                ID
+                ConnectionTypeID
+                ConnectionType {
+                  ID
+                  title
+                  FormalName
+                  IsDiscontinued
+                  IsObsolete
+                }
+                Reference
+                StatusTypeID
+                LevelID
+                Level {
+                  ID
+                  Title
+                  Comments
+                  IsFastChargeCapable
+                }
+                Amps
+                Voltage
+                PowerKW
+                CurrentTypeID
+                CurrentType {
+                  ID
+                  Title
+                }
+                Quantity
+                Comments
+                StatusType {
+                  ID
+                  description
+                  IsOperational
+                  IsUserSelectable
+                }
+              }
+            }
+          }
+          pageInfo {
+            hasNextPage
+            hasPreviousPage
+            startCursor
+            endCursor
+          }
+        }
+      }
+    `;
 
-    (mockRepository.collections.poiListSnapshots.findOne as jest.Mock).mockResolvedValue(
-      poiListSnapshot,
-    );
+    it('should return a list of POIs', async () => {
+      const pois = generateDatabasePOIList();
 
-    (mockRepository.collections.pois.find as jest.Mock).mockImplementation(() => ({
-      limit: () => ({
-        toArray: async () => Promise.resolve(pois),
-      }),
-    }));
+      const { _id, ...expectedPoi } = pois[0];
 
-    const response = (await server.executeOperation({
-      query,
-    })) as GraphQLSingleResult<{ pois: POI[] }>;
+      (
+        mockRepository.collections.poiListSnapshots.findOne as jest.Mock
+      ).mockResolvedValue(poiListSnapshot);
 
-    expect(response).toBeDefined();
-    expect(response.body.singleResult.data).toBeDefined();
-    expect(response.body.singleResult.data?.pois).toEqual(pois);
+      (mockRepository.collections.pois.find as jest.Mock).mockImplementation(() => ({
+        limit: () => ({
+          toArray: async () => Promise.resolve(pois),
+        }),
+      }));
 
-    expect(mockRepository.collections.poiListSnapshots.findOne).toHaveBeenCalledTimes(1);
-    expect(mockRepository.collections.poiListSnapshots.findOne).toHaveBeenCalledWith(
-      { isCompleted: true },
-      { sort: { _id: -1 } },
-    );
+      const response = (await server.executeOperation({
+        query,
+      })) as GraphQLSingleResult<{ pois: PaginatedResult<POI> }>;
 
-    expect(mockRepository.collections.pois.find).toHaveBeenCalledTimes(1);
-    expect(mockRepository.collections.pois.find).toHaveBeenCalledWith({
-      _id: { $in: poiListSnapshot.poiListIds },
+      expect(response).toBeDefined();
+      expect(response.body.singleResult.data).toBeDefined();
+      expect(response.body.singleResult.data?.pois.edges[0].node).toEqual(expectedPoi);
+      expect(response.body.singleResult.data?.pois.pageInfo).toEqual({
+        hasNextPage: true,
+        hasPreviousPage: false,
+        startCursor: pois[0]._id.toString(),
+        endCursor: pois[pois.length - 1]._id.toString(),
+      });
+
+      expect(mockRepository.collections.poiListSnapshots.findOne).toHaveBeenCalledTimes(
+        1,
+      );
+      expect(mockRepository.collections.poiListSnapshots.findOne).toHaveBeenCalledWith(
+        { isCompleted: true },
+        { sort: { _id: -1 } },
+      );
+
+      expect(mockRepository.collections.pois.find).toHaveBeenCalledTimes(1);
+      expect(mockRepository.collections.pois.find).toHaveBeenCalledWith({});
     });
-  });
 
-  it('should return an empty list of POIs - when there are no poiListSnapshots', async () => {
-    (
-      mockRepository.collections.poiListSnapshots.findOne as jest.Mock
-    ).mockImplementation();
+    it('should return an empty list of POIs - when there are no poiListSnapshots', async () => {
+      (
+        mockRepository.collections.poiListSnapshots.findOne as jest.Mock
+      ).mockImplementation();
 
-    const response = (await server.executeOperation({
-      query,
-    })) as GraphQLSingleResult<{ pois: POI[] }>;
+      const response = (await server.executeOperation({
+        query,
+      })) as GraphQLSingleResult<{ pois: PaginatedResult<POI> }>;
 
-    expect(response).toBeDefined();
-    expect(response.body.singleResult.data).toBeDefined();
-    expect(response.body.singleResult.data?.pois).toEqual([]);
+      expect(response).toBeDefined();
+      expect(response.body.singleResult.data).toBeDefined();
+      expect(response.body.singleResult.data?.pois.edges).toEqual([]);
+      expect(response.body.singleResult.data?.pois.pageInfo).toEqual({
+        hasNextPage: false,
+        hasPreviousPage: false,
+        startCursor: null,
+        endCursor: null,
+      });
 
-    expect(mockRepository.collections.poiListSnapshots.findOne).toHaveBeenCalledTimes(1);
-    expect(mockRepository.collections.poiListSnapshots.findOne).toHaveBeenCalledWith(
-      { isCompleted: true },
-      { sort: { _id: -1 } },
-    );
+      expect(mockRepository.collections.poiListSnapshots.findOne).toHaveBeenCalledTimes(
+        1,
+      );
+      expect(mockRepository.collections.poiListSnapshots.findOne).toHaveBeenCalledWith(
+        { isCompleted: true },
+        { sort: { _id: -1 } },
+      );
 
-    expect(mockRepository.collections.pois.find).toHaveBeenCalledTimes(0);
-  });
+      expect(mockRepository.collections.pois.find).toHaveBeenCalledTimes(0);
+    });
 
-  it('should return an empty list of POIs - when there are no pois', async () => {
-    (mockRepository.collections.poiListSnapshots.findOne as jest.Mock).mockResolvedValue(
-      poiListSnapshot,
-    );
+    it('should return an empty list of POIs - when there are no pois', async () => {
+      (
+        mockRepository.collections.poiListSnapshots.findOne as jest.Mock
+      ).mockResolvedValue(poiListSnapshot);
 
-    (mockRepository.collections.pois.find as jest.Mock).mockImplementation(() => ({
-      limit: () => ({
-        toArray: async () => Promise.resolve([]),
-      }),
-    }));
+      (mockRepository.collections.pois.find as jest.Mock).mockImplementation(() => ({
+        limit: () => ({
+          toArray: async () => Promise.resolve([]),
+        }),
+      }));
 
-    const response = (await server.executeOperation({
-      query,
-    })) as GraphQLSingleResult<{ pois: POI[] }>;
+      const response = (await server.executeOperation({
+        query,
+      })) as GraphQLSingleResult<{ pois: PaginatedResult<POI> }>;
 
-    expect(response).toBeDefined();
-    expect(response.body.singleResult.data).toBeDefined();
-    expect(response.body.singleResult.data?.pois).toEqual([]);
+      expect(response).toBeDefined();
+      expect(response.body.singleResult.data).toBeDefined();
+      expect(response.body.singleResult.data?.pois.edges).toEqual([]);
+      expect(response.body.singleResult.data?.pois.pageInfo).toEqual({
+        hasNextPage: false,
+        hasPreviousPage: false,
+        startCursor: null,
+        endCursor: null,
+      });
 
-    expect(mockRepository.collections.poiListSnapshots.findOne).toHaveBeenCalledTimes(1);
-    expect(mockRepository.collections.poiListSnapshots.findOne).toHaveBeenCalledWith(
-      { isCompleted: true },
-      { sort: { _id: -1 } },
-    );
+      expect(mockRepository.collections.poiListSnapshots.findOne).toHaveBeenCalledTimes(
+        1,
+      );
+      expect(mockRepository.collections.poiListSnapshots.findOne).toHaveBeenCalledWith(
+        { isCompleted: true },
+        { sort: { _id: -1 } },
+      );
 
-    expect(mockRepository.collections.pois.find).toHaveBeenCalledTimes(1);
-    expect(mockRepository.collections.pois.find).toHaveBeenCalledWith({
-      _id: { $in: poiListSnapshot.poiListIds },
+      expect(mockRepository.collections.pois.find).toHaveBeenCalledTimes(1);
+      expect(mockRepository.collections.pois.find).toHaveBeenCalledWith({});
     });
   });
 });
