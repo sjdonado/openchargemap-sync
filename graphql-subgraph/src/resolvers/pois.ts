@@ -44,6 +44,10 @@ const pois: CustomResolver<PaginatedResult<POI>> = async (
 
   const edges = poiListToEdges(poiListFromLatestSnapshot);
 
+  console.log(
+    `[poisResolver] poiListIds: ${latestSnapshot.poiListIds.length} edges: ${edges.length}`,
+  );
+
   const pageInfo = getPageInfo(edges, latestSnapshot.poiListIds);
 
   return { edges, pageInfo };

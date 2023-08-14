@@ -51,16 +51,19 @@ Ran all test suites.
 --------------------|---------|----------|---------|---------|-------------------
 File                | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s
 --------------------|---------|----------|---------|---------|-------------------
-All files           |   96.65 |     92.3 |   88.88 |   96.65 |
+All files           |   98.81 |    89.65 |    90.9 |   98.81 |
  __tests__/fixtures |     100 |      100 |     100 |     100 |
   pois.ts           |     100 |      100 |     100 |     100 |
- __tests__/mocks    |   88.46 |      100 |     100 |   88.46 |
-  repository.ts     |   88.46 |      100 |     100 |   88.46 | 9-11
- src                |   88.46 |      100 |     100 |   88.46 |
-  server.ts         |   88.46 |      100 |     100 |   88.46 | 41-46
+  queries.ts        |     100 |      100 |     100 |     100 |
+ __tests__/mocks    |     100 |      100 |     100 |     100 |
+  repository.ts     |     100 |      100 |     100 |     100 |
+ src                |    87.5 |      100 |     100 |    87.5 |
+  server.ts         |    87.5 |      100 |     100 |    87.5 | 44-50
  src/config         |     100 |        0 |     100 |     100 |
   constants.ts      |     100 |      100 |     100 |     100 |
   env.ts            |     100 |        0 |     100 |     100 | 6
+ src/helpers        |     100 |     87.5 |     100 |     100 |
+  pagination.ts     |     100 |     87.5 |     100 |     100 | 21
  src/repository     |     100 |      100 |      50 |     100 |
   database.ts       |     100 |      100 |      50 |     100 |
  src/resolvers      |     100 |      100 |     100 |     100 |
@@ -71,11 +74,11 @@ All files           |   96.65 |     92.3 |   88.88 |   96.65 |
 --------------------|---------|----------|---------|---------|-------------------
 
 Test Suites: 2 passed, 2 total
-Tests:       4 passed, 4 total
+Tests:       9 passed, 9 total
 Snapshots:   0 total
-Time:        3.008 s
+Time:        4.099 s
 Ran all test suites.
-✨  Done in 3.53s.
+✨  Done in 4.64s.
 ```
 
 ## Linter reports

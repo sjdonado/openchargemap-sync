@@ -18,20 +18,12 @@ export const applyPagination = <T>(
 ): FindCursor<T> => {
   const { first, after, last, before } = pageInfo;
 
-  if (after) {
+  if (filter._id !== undefined || before !== undefined || after !== undefined) {
     cursor = cursor.filter({
       _id: {
         ...filter._id,
-        $gt: MUUID.from(after),
-      },
-    });
-  }
-
-  if (before) {
-    cursor = cursor.filter({
-      _id: {
-        ...filter._id,
-        $lt: MUUID.from(before),
+        ...(before ? { $lt: MUUID.from(before) } : {}),
+        ...(after ? { $gt: MUUID.from(after) } : {}),
       },
     });
   }
@@ -44,7 +36,7 @@ export const applyPagination = <T>(
     cursor = cursor.skip(last);
   }
 
-  if (!first && !last) {
+  if (first === undefined && last === undefined) {
     cursor = cursor.limit(PAGINATION_MAX_ITEMS);
   }
 

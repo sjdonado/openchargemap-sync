@@ -21,9 +21,11 @@ export const schemas = loadFilesSync<DocumentNode>('./src/schemas/*.graphql');
 export const start = async () => {
   const typeDefs = schemas.concat(directives);
 
+  const keyv = new Keyv(env.REDIS_URI);
+
   const server = new ApolloServer({
     schema: buildSubgraphSchema({ typeDefs, resolvers }),
-    cache: new KeyvAdapter(new Keyv(env.REDIS_URI)),
+    cache: new KeyvAdapter(keyv),
     csrfPrevention: false,
   });
 
@@ -42,6 +44,7 @@ export const start = async () => {
     console.log('[server] Server is stopping...');
 
     await disconnectDatabase();
+    await keyv.disconnect();
 
     console.log('[server] Server stopped');
     process.exit(0);

@@ -2,27 +2,16 @@ import { type FindCursor, type Collection } from 'mongodb';
 
 import { type Repository } from '../../src/@types/server';
 
-const mockCursor = {
+export const mockCursor = {
   filter: jest.fn(),
   limit: jest.fn(),
+  skip: jest.fn(),
   toArray: jest.fn(),
-};
+} as unknown as jest.Mocked<FindCursor>;
 
 const mockCollection = {
-  countDocuments: jest.fn(),
-  find: jest.fn(
-    () =>
-      ({
-        filter: jest.fn(() => mockCursor),
-        limit: jest.fn(),
-        toArray: jest.fn(),
-      }) as unknown as jest.Mocked<FindCursor>,
-  ),
+  find: jest.fn(() => mockCursor),
   findOne: jest.fn(),
-  insertOne: jest.fn(),
-  updateOne: jest.fn(),
-  deleteOne: jest.fn(),
-  insertMany: jest.fn(),
 } as unknown as jest.Mocked<Collection>;
 
 export const mockRepository: jest.Mocked<Repository> = {

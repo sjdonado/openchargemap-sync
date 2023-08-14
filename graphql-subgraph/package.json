@@ -6,7 +6,7 @@
     "build": "tsc --p tsconfig.prod.json",
     "start": "node ./dist/bin/index.js",
     "dev": "tsc-watch --onSuccess \"node ./build/src/bin/index.js\"",
-    "test": "jest --detectOpenHandles",
+    "test": "jest",
     "lint": "eslint . --ext .ts"
   },
   "keywords": [],
