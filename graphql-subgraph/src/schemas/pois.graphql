@@ -1,5 +1,5 @@
 type POI {
-  OperatorInfo: OperatorInfo!
+  OperatorInfo: OperatorInfo
   StatusType: StatusType!
   AddressInfo: AddressInfo
   Connections: [Connection!]!
@@ -14,12 +14,12 @@ type Country {
 
 type AddressInfo {
   ID: Float!
-  Description: String!
+  Description: String
   AddressLine1: String!
   AddressLine2: String
-  Town: String!
-  StateOrProvince: String!
-  Postcode: String!
+  Town: String
+  StateOrProvince: String
+  Postcode: String
   CountryID: Float!
   Country: Country!
   Latitude: Float!
@@ -35,32 +35,32 @@ type AddressInfo {
 
 type OperatorInfo {
   ID: Float!
-  description: String!
-  WebsiteURL: String!
+  description: String
+  WebsiteURL: String
   Comments: String
   PhonePrimaryContact: String
   PhoneSecondaryContact: String
-  IsPrivateIndividual: Boolean!
+  IsPrivateIndividual: Boolean
   AddressInfo: AddressInfo
   BookingURL: String
   ContactEmail: String
   FaultReportEmail: String
-  IsRestrictedEdit: Boolean!
+  IsRestrictedEdit: Boolean
 }
 
 type StatusType {
   ID: Float!
-  description: String!
-  IsOperational: Boolean!
+  description: String
+  IsOperational: Boolean
   IsUserSelectable: Boolean!
 }
 
 type ConnectionType {
   ID: Float!
-  title: String!
-  FormalName: String!
-  IsDiscontinued: Boolean!
-  IsObsolete: Boolean!
+  title: String
+  FormalName: String
+  IsDiscontinued: Boolean
+  IsObsolete: Boolean
 }
 
 type Level {
@@ -80,16 +80,16 @@ type Connection {
   ConnectionTypeID: Float!
   ConnectionType: ConnectionType!
   Reference: String
-  StatusTypeID: Float!
-  StatusType: StatusType!
-  LevelID: Float!
-  Level: Level!
+  StatusTypeID: Float
+  StatusType: StatusType
+  LevelID: Float
+  Level: Level
   Amps: Float
   Voltage: Float
-  PowerKW: Float!
-  CurrentTypeID: Float!
-  CurrentType: CurrentType!
-  Quantity: Float!
+  PowerKW: Float
+  CurrentTypeID: Float
+  CurrentType: CurrentType
+  Quantity: Float
   Comments: String
 }
 

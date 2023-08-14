@@ -3,11 +3,11 @@ type Query {
 }
 
 type PoisConnection {
-  edges: [POIEdge]!
+  edges: [POIEdge!]!
   pageInfo: PageInfo!
 }
 
 type POIEdge {
-  cursor: String
+  cursor: String!
   node: POI!
 }
