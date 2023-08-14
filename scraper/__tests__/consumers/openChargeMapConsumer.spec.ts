@@ -275,15 +275,6 @@ describe('openChargeMapConsumer', () => {
       },
     );
 
-    expect(
-      mockRepository.collections.poiListSnapshots.findOneAndDelete,
-    ).toHaveBeenCalledWith({
-      isCompleted: true,
-      _id: {
-        $ne: expect.anything() as jest.Mocked<MUUID.MUUID>,
-      },
-    });
-
     expect(mockChannel.ack).toHaveBeenCalledWith(mockMsg);
   });
 

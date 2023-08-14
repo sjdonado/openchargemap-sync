@@ -71,16 +71,21 @@ export const openChargeMapConsumer: Consumer = async (msg, channel, repository) 
         session,
       });
 
-      if (isCompleted) {
-        await repository.collections.poiListSnapshots.findOneAndDelete({
-          isCompleted: true,
-          // @ts-expect-error _id is a valid field
-          _id: { $ne: filter._id },
-        });
-      }
+      // TODO: database cleanup: remove old poiListSnapshots + pois
+      // if (isCompleted) {
+      //   await repository.collections.poiListSnapshots.findOneAndDelete({
+      //     isCompleted: true,
+      //     // @ts-expect-error _id is a valid field
+      //     _id: { $ne: filter._id },
+      //   });
+      // }
 
       console.log(
         `[openChargeMapConsumer]: ${poiListChunkIds.length} POIs stored in database`,
+      );
+
+      console.log(
+        `[openChargeMapConsumer]: ${country.ISOCode} - poiListIds ${update.$set.poiListIds.length}`,
       );
     });
 

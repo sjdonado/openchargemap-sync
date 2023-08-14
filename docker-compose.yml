@@ -1,5 +1,43 @@
 version: '3'
 services:
+  subgraph_service:
+    build:
+      context: .
+      dockerfile: Dockerfile.subgraph
+    container_name: subgraph_service
+    restart: always
+    environment:
+      - PORT=${GRAPHQL_PORT}
+      - MONGO_URI=${MONGO_URI}
+      - REDIS_URI=${REDIS_URI}
+    ports:
+      - ${GRAPHQL_PORT}:${GRAPHQL_PORT}
+    depends_on:
+      - mongo1
+      - redis
+      - scraper_service
+  scraper_service:
+    build:
+      context: .
+      dockerfile: Dockerfile.scraper
+    container_name: scraper_service
+    restart: always
+    environment:
+      - PORT=${SCRAPER_PORT}
+      - MONGO_URI=${MONGO_URI}
+      - RABBITMQ_URI=${RABBITMQ_URI}
+      - RABBITMQ_QUEUE=${RABBITMQ_QUEUE}
+      - RABBITMQ_EXCHANGE=${RABBITMQ_EXCHANGE}
+      - RABBITMQ_DLX=${RABBITMQ_DLX}
+      - RABBITMQ_DLQ=${RABBITMQ_DLQ}
+      - OPENCHARGEMAP_BASE_URL=${OPENCHARGEMAP_BASE_URL}
+      - OPENCHARGEMAP_API_KEY=${OPENCHARGEMAP_API_KEY}
+      - OPENCHARGEMAP_ALLOWED_COUNTRIES=${OPENCHARGEMAP_ALLOWED_COUNTRIES}
+    ports:
+      - ${SCRAPER_PORT}:${SCRAPER_PORT}
+    depends_on:
+      - mongo1
+      - rabbitmq
   mongo1:
     image: mongo:5
     container_name: mongo1
@@ -11,14 +49,12 @@ services:
       - 27017:27017
     links:
       - mongo2
-    networks:
-      - mongo-cluster
     healthcheck:
       test: test $$(echo "rs.initiate({_id:'rs0',members:[{_id:0,host:'mongo1:27017'},{_id:1,host:'mongo2:27018'}]}).ok || rs.status().ok" | mongo --port 27017 --quiet) -eq 1
       interval: 10s
       start_period: 20s
     depends_on:
-        - mongo2
+      - mongo2
   mongo2:
     image: mongo:5
     container_name: mongo2
@@ -28,24 +64,20 @@ services:
       - mongo2-data:/data/db
     ports:
       - 27018:27018
-    networks:
-      - mongo-cluster
   redis:
     image: redis:latest
+    container_name: redis
     ports:
       - 6379:6379
   rabbitmq:
     image: rabbitmq:management
+    container_name: rabbitmq
     ports:
       - 5672:5672
       - 15672:15672
     environment:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
-
-networks:
-  mongo-cluster:
-    driver: bridge
 
 volumes:
   mongo1-data:
