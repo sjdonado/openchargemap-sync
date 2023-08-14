@@ -1,8 +1,14 @@
+import type * as MUUID from 'uuid-mongodb';
+
 export type POI = {
   OperatorInfo: OperatorInfo;
   StatusType: StatusType;
   AddressInfo: AddressInfo;
   Connections: Connection[];
+};
+
+export type POIDatabase = POI & {
+  _id: MUUID.MUUID;
 };
 
 export type Country = {

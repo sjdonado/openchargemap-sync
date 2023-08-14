@@ -1,13 +1,10 @@
-import * as MUUID from 'uuid-mongodb';
-
 import { type POI } from '../@types/pois';
 import { type POIListSnapshot } from '../@types/poiListSnapshot';
 import { type CustomResolver } from '../@types/server';
-
-import { PAGINATION_MAX_ITEMS } from '../config/constants';
-
-import { poiListToEdges } from '../serializers/poi';
 import { type PaginatedResult } from '../@types/pagination';
+
+import { applyPagination, getPageInfo } from '../helpers/pagination';
+import { poiListToEdges } from '../serializers/poi';
 
 const pois: CustomResolver<PaginatedResult<POI>> = async (
   _parent,
@@ -30,39 +27,24 @@ const pois: CustomResolver<PaginatedResult<POI>> = async (
     };
   }
 
-  let cursor = repository.collections.pois.find<POI>({
+  const filter = {
     _id: {
-      // @ts-expect-error _id is a valid field
       $in: latestSnapshot.poiListIds,
-      ...(after ? { $gt: MUUID.from(after) } : {}),
-      ...(before ? { $lt: MUUID.from(before) } : {}),
     },
-  });
+  };
 
-  if (first) {
-    cursor = cursor.limit(first);
-  }
+  const cursor = repository.collections.pois.find({});
 
-  if (last) {
-    cursor = cursor.skip(last);
-  }
-
-  if (!first && !last) {
-    cursor = cursor.limit(PAGINATION_MAX_ITEMS);
-  }
-
-  const poiListFromLatestSnapshot = await cursor.toArray();
+  const poiListFromLatestSnapshot = await applyPagination(cursor, filter, {
+    first,
+    after,
+    last,
+    before,
+  }).toArray();
 
   const edges = poiListToEdges(poiListFromLatestSnapshot);
 
-  const pageInfo = {
-    hasNextPage: edges.length < latestSnapshot.poiListIds.length,
-    hasPreviousPage:
-      // @ts-expect-error _id is a valid field
-      latestSnapshot.poiListIds.indexOf(poiListFromLatestSnapshot[0]?._id) > 0,
-    startCursor: edges[0]?.cursor,
-    endCursor: edges[edges.length - 1]?.cursor,
-  };
+  const pageInfo = getPageInfo(edges, latestSnapshot.poiListIds);
 
   return { edges, pageInfo };
 };

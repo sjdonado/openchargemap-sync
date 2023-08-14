@@ -1,3 +1,5 @@
+import type * as MUUID from 'uuid-mongodb';
+
 export type Edge<T> = {
   cursor: string;
   node: T;
@@ -20,4 +22,8 @@ export type PageInfoArgs = {
   after?: string;
   last?: number;
   before?: string;
+};
+
+export type CustomFilter = {
+  _id: { $in: MUUID.MUUID[] };
 };
