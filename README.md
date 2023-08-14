@@ -1,9 +1,12 @@
 # openchargemap-sync
 
+- Architecture https://github.com/sjdonado/openchargemap-sync/issues/4
+- Future work https://github.com/sjdonado/openchargemap-sync/issues/4#issuecomment-1677994039
+
 ## Setup and run
 
 1. Create `.env` (copy and paste from `./.env.example`)
-2. Run docker-compose + scripts (sudo required)
+2. Run docker-compose + init database
 ```bash
 ./setup.sh
 ```
